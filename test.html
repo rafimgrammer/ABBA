@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>에이빠 기획서 초안 — 1~4장</title>
+<style>
+  :root{
+    --ink:#15181D;
+    --paper:#FFFFFF;
+    --wash:#F5F6F8;
+    --rule:#DCE0E6;
+    --muted:#5D6572;
+    --accent:#12457F;
+    --accent-soft:#E7EFF8;
+    --flag:#8A5300;
+    --flag-soft:#FBF2E2;
+    --maxw:760px;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--wash);
+    color:var(--ink);
+    font-family:'Pretendard','Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;
+    font-size:16px;
+    line-height:1.75;
+    letter-spacing:-0.01em;
+  }
+  .sheet{
+    max-width:var(--maxw);
+    margin:0 auto;
+    background:var(--paper);
+    padding:64px 56px 96px;
+    border-left:1px solid var(--rule);
+    border-right:1px solid var(--rule);
+    min-height:100vh;
+  }
+
+  /* ---- 표지 영역 ---- */
+  .masthead{border-bottom:2px solid var(--ink);padding-bottom:28px;margin-bottom:44px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:0.14em;font-weight:700;
+    color:var(--accent);text-transform:uppercase;margin:0 0 14px;
+  }
+  h1{
+    font-size:38px;line-height:1.25;margin:0 0 10px;
+    font-weight:800;letter-spacing:-0.035em;
+  }
+  .subtitle{font-size:17px;color:var(--muted);margin:0 0 24px;font-weight:500;}
+  .meta{
+    display:grid;grid-template-columns:96px 1fr;gap:6px 18px;
+    font-size:13.5px;color:var(--muted);
+  }
+  .meta dt{font-weight:700;color:var(--ink);}
+  .meta dd{margin:0;}
+
+  /* ---- 장 구조 ---- */
+  .chapter{margin:0 0 60px;}
+  .chapter-head{
+    display:flex;align-items:baseline;gap:14px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:10px;margin-bottom:26px;
+  }
+  .chapter-num{
+    font-size:13px;font-weight:800;color:var(--accent);
+    letter-spacing:0.08em;font-variant-numeric:tabular-nums;
+    flex:none;
+  }
+  h2{font-size:24px;font-weight:800;margin:0;letter-spacing:-0.025em;}
+  h3{
+    font-size:17px;font-weight:700;margin:34px 0 12px;
+    letter-spacing:-0.02em;
+  }
+  h4{font-size:15px;font-weight:700;margin:22px 0 8px;color:var(--accent);}
+  p{margin:0 0 15px;}
+  strong{font-weight:700;}
+  .lede{
+    font-size:18px;line-height:1.7;font-weight:600;
+    color:var(--ink);margin-bottom:22px;
+  }
+
+  /* ---- 근거 박스 (시그니처) ---- */
+  .evidence{
+    border-top:2px solid var(--accent);
+    background:var(--accent-soft);
+    padding:22px 24px;margin:24px 0 26px;
+  }
+  .evidence-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:20px;margin-bottom:16px;
+  }
+  .stat .num{
+    font-size:32px;font-weight:800;line-height:1.05;
+    color:var(--accent);font-variant-numeric:tabular-nums;
+    letter-spacing:-0.04em;display:block;
+  }
+  .stat .num small{font-size:16px;font-weight:700;letter-spacing:0;}
+  .stat .lbl{
+    font-size:12.5px;color:var(--muted);line-height:1.45;
+    display:block;margin-top:5px;font-weight:600;
+  }
+  .evidence .src{
+    font-size:12px;color:var(--muted);margin:0;
+    padding-top:12px;border-top:1px solid #C9DAEC;
+  }
+  .evidence p.read{margin:0 0 14px;font-size:14.5px;}
+
+  /* ---- 태그 ---- */
+  .tag{
+    display:inline-block;font-size:11.5px;font-weight:700;
+    padding:1px 7px;border-radius:3px;vertical-align:2px;
+    letter-spacing:0.02em;
+  }
+  .tag-check{background:var(--flag-soft);color:var(--flag);border:1px solid #E5CE9F;}
+  .tag-hypo{background:#EFEAF7;color:#5B3E97;border:1px solid #D5C9EC;}
+
+  /* ---- 표 ---- */
+  table{
+    width:100%;border-collapse:collapse;margin:18px 0 22px;
+    font-size:14px;
+  }
+  th,td{
+    text-align:left;padding:10px 12px;
+    border-bottom:1px solid var(--rule);vertical-align:top;
+  }
+  thead th{
+    background:var(--wash);font-weight:700;font-size:12.5px;
+    letter-spacing:0.02em;border-bottom:1.5px solid var(--ink);
+  }
+  td.num-cell{font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+  /* ---- 리스트 ---- */
+  ul,ol{margin:0 0 16px;padding-left:20px;}
+  li{margin-bottom:7px;}
+
+  /* ---- 단계 흐름 ---- */
+  .flow{border-left:2px solid var(--rule);margin:20px 0 24px;padding-left:0;list-style:none;}
+  .flow li{
+    position:relative;padding:0 0 20px 24px;margin:0;
+  }
+  .flow li::before{
+    content:attr(data-step);
+    position:absolute;left:-9px;top:2px;
+    width:16px;height:16px;border-radius:50%;
+    background:var(--accent);color:#fff;
+    font-size:10px;font-weight:800;line-height:16px;
+    text-align:center;
+  }
+  .flow .step-title{font-weight:700;display:block;margin-bottom:3px;}
+  .flow .step-body{font-size:14.5px;color:var(--muted);display:block;line-height:1.6;}
+
+  /* ---- 인용/강조 블록 ---- */
+  .callout{
+    border-left:3px solid var(--ink);
+    padding:4px 0 4px 18px;margin:22px 0;
+    font-size:16.5px;font-weight:600;line-height:1.65;
+  }
+  .note{
+    background:var(--wash);border:1px solid var(--rule);
+    padding:16px 18px;margin:20px 0;font-size:14px;
+    color:var(--muted);line-height:1.65;
+  }
+  .note b{color:var(--ink);}
+
+  footer{
+    margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
+    font-size:12.5px;color:var(--muted);
+  }
+
+  @media (max-width:640px){
+    .sheet{padding:40px 22px 64px;}
+    h1{font-size:28px;}
+    h2{font-size:21px;}
+    .evidence-grid{grid-template-columns:1fr;gap:16px;}
+    .meta{grid-template-columns:78px 1fr;}
+    table{font-size:13px;}
+    th,td{padding:8px 8px;}
+  }
+  @media print{
+    body{background:#fff;}
+    .sheet{border:none;padding:0;max-width:none;}
+    .chapter{break-inside:avoid-page;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <p class="eyebrow">2026 금융 AI Challenge · 기획서 초안</p>
+    <h1>에이빠</h1>
+    <p class="subtitle">목표부터 묻는 청년 금융 설계 에이전트</p>
+    <dl class="meta">
+      <dt>대회</dt><dd>2026 금융 AI Challenge (금융보안원 주최 · 금융위원회 후원)</dd>
+      <dt>제출 범위</dt><dd>기획서 + 기능명세서 + 배포 URL</dd>
+      <dt>문서 상태</dt><dd>1~9장 초안 완결 · 검증 항목 잔여</dd>
+      <dt>작성 기준일</dt><dd>2026년 8월 27일</dd>
+    </dl>
+  </header>
+
+  <!-- ============ 1장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">01</span>
+      <h2>문제 정의</h2>
+    </div>
+
+    <p class="lede">청년은 금융 앱을 못 쓰는 세대가 아니다. 앱은 가장 잘 쓰면서, 목표는 가장 못 세우는 세대다.</p>
+
+    <p>이 모순이 한국 청년 금융 문제의 핵심이다. 그리고 이것은 인상이 아니라 통계로 확인된다.</p>
+
+    <div class="evidence">
+      <div class="evidence-grid">
+        <div class="stat">
+          <span class="num">62.6<small>점</small></span>
+          <span class="lbl">20대 금융이해력<br>(성인 평균 65.7점)</span>
+        </div>
+        <div class="stat">
+          <span class="num">36.1<small>점</small></span>
+          <span class="lbl">20대 재무목표 설정<br>(2022년 48.0점)</span>
+        </div>
+        <div class="stat">
+          <span class="num">33.2<small>점</small></span>
+          <span class="lbl">20대 재무점검<br>(2022년 55.8점)</span>
+        </div>
+      </div>
+      <p class="read"><b>읽는 법.</b> 20대의 금융이해력은 70대(59.3점)를 제외하면 전 연령대 중 가장 낮다. 그런데 같은 조사에서 20대의 <b>디지털 금융이해력은 평균 이상</b>으로 나타났다. 도구를 다루는 능력과 계획을 세우는 능력이 정반대 방향으로 벌어져 있다는 뜻이다.</p>
+      <p class="src">출처: 한국은행·금융감독원, 「2024 전국민 금융이해력 조사」(2025.04.29 발표). 만 18~79세 성인 2,400명 대상. 연령대별 세부 점수는 한국청소년정책연구원 연구보고 25-기본02 재인용.</p>
+    </div>
+
+    <h3>1.1 기존 서비스가 못 푸는 이유</h3>
+
+    <p>시장에는 이미 좋은 금융 앱이 많다. 그런데 이 문제만은 비어 있다. 각 서비스가 다루는 <strong>시간축</strong>이 다르기 때문이다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:26%">유형</th><th style="width:16%">보는 시간</th><th>사용자에게 남기는 질문</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>가계부·자산 조회</td><td>과거</td><td>"그래서 나는 잘하고 있는 건가?"</td></tr>
+        <tr><td>상품 비교·추천</td><td>현재</td><td>"이 상품이 내 목표에 맞는 건 맞나?"</td></tr>
+        <tr><td>로보어드바이저</td><td>미래</td><td>"투자 말고 저축이 먼저 아닌가?"</td></tr>
+        <tr><td>은행 PB 상담</td><td>미래</td><td>"자산이 없으면 상담 대상이 아니다"</td></tr>
+        <tr><td>범용 AI 챗봇</td><td>없음</td><td>"내 상황을 매번 다시 설명해야 한다"</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>미래를 다루면서, 자산이 적은 사람을 대상으로 하고, 투자가 아닌 경로 전체를 설계하는 자리가 비어 있다.</strong> 재무목표 점수 36.1점은 이 공백의 크기다.</p>
+
+    <h3>1.2 원래 이 자리를 채우던 것</h3>
+
+    <p>이 역할은 원래 제도가 아니라 가정에서 수행돼 왔다. 전세 계약 전에 무엇을 확인해야 하는지, 청약통장을 언제 만들어야 하는지, 첫 월급을 어떻게 쪼개야 하는지는 학교에서 가르치지 않고 은행이 알려주지도 않는다. 아는 집에서는 부모가 알려주고, 아닌 집에서는 아무도 알려주지 않는다.</p>
+
+    <div class="callout">문제는 정보의 부족이 아니라 <strong>나에게 적용된 순서의 부재</strong>다. 정보는 검색하면 나온다. 나오지 않는 것은 "내 조건에서 무엇을 먼저 해야 하는가"다.</div>
+
+    <p>그 결과가 금융 격차의 세습이다. 정보 접근성이 평등해진 시대에도 격차가 좁혀지지 않는 이유가 여기에 있다. <span class="tag tag-hypo">가설</span> 이 인과관계는 본 기획서의 문제 인식이며, 실증 연구로 뒷받침할 필요가 있다.</p>
+
+    <h3>1.3 해결해야 할 문제</h3>
+
+    <ol>
+      <li><strong>목표가 없다.</strong> 얼마를 언제까지 모을지 정하지 못한 상태에서 금융 상품부터 고른다.</li>
+      <li><strong>목표가 있어도 경로가 없다.</strong> "3년 안에 3천만원"과 현재 소득 사이를 잇는 계산을 스스로 하지 못한다.</li>
+      <li><strong>경로가 있어도 유지되지 않는다.</strong> 한 달 이탈하면 계획 전체를 포기한다. 재설계해주는 주체가 없다.</li>
+      <li><strong>때를 놓친다.</strong> 청년 정책금융, 청약, 연말정산은 신청 기간이 정해져 있는데 알림을 주는 곳이 없다.</li>
+    </ol>
+  </section>
+
+  <!-- ============ 2장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">02</span>
+      <h2>타겟</h2>
+    </div>
+
+    <p class="lede">돈은 들어오는데 계획이 없는 사람. 자산이 적어서 어디서도 상담 대상이 되지 못하는 사람.</p>
+
+    <h3>2.1 핵심 타겟</h3>
+    <p>만 19~34세 중 <strong>정기적이거나 반정기적인 소득이 발생하기 시작했으나 재무 목표를 문서화한 적이 없는 층</strong>. 대학 후반 학년부터 직장 3~5년차까지가 중심이다.</p>
+
+    <p>규모는 <span class="tag tag-check">확인 필요</span> — 통계청 경제활동인구조사 기준 청년층 취업자 수와 청년 인구를 인용해 확정한다.</p>
+
+    <h3>2.2 페르소나</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:22%">유형</th><th style="width:26%">상황</th><th>이 서비스에 오는 이유</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>첫 월급</b><br>24세, 입사 3개월</td>
+          <td>월 실수령 240만원. 통장 하나에 다 들어 있음</td>
+          <td>"1천만원을 모으고 싶은데 얼마씩 넣어야 하는지 모르겠다"</td>
+        </tr>
+        <tr>
+          <td><b>독립 준비</b><br>31세, 직장 5년차</td>
+          <td>2년 뒤 전세 이사 예정. 보증금 부족액 존재</td>
+          <td>"기간이 정해져 있는데 지금 속도로 도달 가능한지 모르겠다"</td>
+        </tr>
+        <tr>
+          <td><b>불규칙 소득</b><br>27세, 프리랜서</td>
+          <td>월 소득 120~400만원 변동</td>
+          <td>"월 고정 적금 기반 서비스는 나에게 맞지 않는다"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>세 번째 유형은 의도적으로 포함했다. 기존 자산관리 서비스는 <strong>고정 월급을 전제</strong>하기 때문에 소득이 불규칙한 층을 사실상 배제한다. 이 층을 다루는 것 자체가 차별점이 된다.</p>
+
+    <h3>2.3 대상에서 제외하는 층</h3>
+    <ul>
+      <li><strong>고자산층</strong> — 이미 은행 PB와 세무사가 담당하는 영역. 경쟁하지 않는다.</li>
+      <li><strong>연체·채무 위기 상태</strong> — 신용회복위원회 채무조정이 필요한 단계로, 설계가 아니라 구제의 영역이다. 서비스는 이 상태를 감지하면 <strong>공적 기관 안내로 전환</strong>한다.</li>
+      <li><strong>투자 수익 극대화가 목적인 사용자</strong> — 목표 달성 설계가 아니라 투자자문 영역이며, 등록 없이 제공할 수 없다.</li>
+    </ul>
+
+    <div class="note"><b>심사 관점.</b> 본 대회 2025년 입상작은 「소상공인 AI 위기관리 솔루션」과 「임산부를 위한 AI 금융비서」였다. 두 작품 모두 <b>특정 집단 + 금융 접근성</b> 구조다. 본 기획의 타겟 설정은 이 계보 위에 있으며, 대상 집단을 "청년"으로 넓게 잡기보다 위 세 페르소나로 좁혀 서술한다.</div>
+  </section>
+
+  <!-- ============ 3장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">03</span>
+      <h2>솔루션</h2>
+    </div>
+
+    <p class="lede">목표를 먼저 묻고, 도달 경로를 계산하고, 달성 여부를 매달 추적한다. 상품은 팔지 않는다.</p>
+
+    <h3>3.1 사용 흐름</h3>
+
+    <ul class="flow">
+      <li data-step="1">
+        <span class="step-title">목표 설정</span>
+        <span class="step-body">첫 화면에서 상품이 아니라 목표를 묻는다. 내집마련 · 목돈 마련(금액 직접 입력) · 특정 구매(금액·품목) · 부채 상환 · 비상금 확보 중 선택. 재무목표 점수 36.1점이라는 문제를 첫 화면에서 정면으로 다룬다.</span>
+      </li>
+      <li data-step="2">
+        <span class="step-title">기간 확정 또는 무기한 선택</span>
+        <span class="step-body">목표 시점이 정해진 사용자는 기간을 입력한다. <b>기간을 정하지 못한 사용자는 무기한을 선택</b>하며, 이 경우 4.1의 목표 생성 모드로 분기한다. 기간이 없다는 이유로 서비스를 이용하지 못하는 상태를 만들지 않는다.</span>
+      </li>
+      <li data-step="3">
+        <span class="step-title">현재 상태 입력 (2경로)</span>
+        <span class="step-body"><b>빠른 경로</b>는 월 실수령액과 저축 가능액 두 개만 묻는다. <b>정밀 경로</b>는 고정지출 항목, 보유 자산, 부채 잔액·금리까지 받아 최대 7개 항목이다. 사용자는 언제든 빠른 경로에서 정밀 경로로 전환할 수 있다. 불규칙 소득은 월별 범위로 입력받는다.</span>
+      </li>
+      <li data-step="4">
+        <span class="step-title">설계</span>
+        <span class="step-body">필요 월 저축액, 목표 유형별 배분 비율, 12개월 실행 캘린더를 생성한다. 목표가 현재 조건으로 도달 불가능하면 <b>대안 3개</b>를 제시한다.</span>
+      </li>
+      <li data-step="5">
+        <span class="step-title">추적과 재설계</span>
+        <span class="step-body">월 1회 체크인. 계획 대비 편차를 계산하고, 이탈했을 때 포기시키지 않고 경로를 다시 계산한다.</span>
+      </li>
+    </ul>
+
+    <div class="note"><b>입력 방식.</b> 폼과 대화를 병행한다. 기본은 폼이며, 사용자가 항목을 건너뛰거나 "잘 모르겠다"를 선택하면 언어모델이 대화로 되묻는다. 대화 단독 수집은 이탈률이 높고 입력 검증이 어려워 기본값으로 두지 않는다.</div>
+
+    <h3>3.2 MVP 화면 구성</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:20%">화면</th><th style="width:38%">기능</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>목표 선택</td><td>5개 목표 유형, 금액 입력, 유기한·무기한 분기</td><td>진입 화면</td></tr>
+        <tr><td>조건 입력</td><td>빠른 경로 2항목 / 정밀 경로 최대 7항목</td><td>단계별 분할 입력</td></tr>
+        <tr><td>설계 결과</td><td>월 저축액, 배분, 도달 시점 그래프</td><td>핵심 데모 화면</td></tr>
+        <tr><td>실행 캘린더</td><td>12개월 행동 목록, 시기별 알림 항목</td><td>선제 알림의 근거</td></tr>
+        <tr><td>재설계 대화</td><td>목표 조정 협상, 목표 생성, 이탈 시 경로 재계산</td><td>AI 활용 지점</td></tr>
+      </tbody>
+    </table>
+
+    <p>화면 5개는 마감(9월 7일)까지의 개발 가능 범위를 기준으로 산정한 것이다. 이 범위를 넘기면 배포 URL이 나오지 않는다.</p>
+
+    <h3>3.3 기술 구조</h3>
+
+    <p>Next.js(App Router) + TypeScript + Supabase + Vercel. AI는 Claude API를 사용한다. 핵심은 <strong>무엇을 AI에 맡기고 무엇을 맡기지 않는가</strong>이며, 이는 4장에서 상술한다.</p>
+
+    <div class="note"><b>데이터 조달.</b> 외부 실데이터 의존을 최소화하는 설계다. 사용자 입력값과 공개 데이터(정책금융 공고, 금리 공시)만으로 동작하므로 데이터 확보 실패로 인한 구현 중단 위험이 없다. <span class="tag tag-check">확인 필요</span> — 금융상품통합비교공시 등 공공 API의 실제 이용 조건은 착수 전 확인한다.</div>
+  </section>
+
+  <!-- ============ 4장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">04</span>
+      <h2>차별점</h2>
+    </div>
+
+    <p class="lede">"계산기와 챗봇을 붙인 것 아닌가"라는 질문에 답하지 못하면 이 기획은 성립하지 않는다. 이 장은 그 질문에 대한 답이다.</p>
+
+    <h3>4.1 계산하지 않고 협상한다</h3>
+
+    <p>목표 기반 재무 계산기는 이미 많다. 그러나 거의 모두 같은 곳에서 멈춘다. <strong>목표가 현재 조건으로 도달 불가능할 때</strong>다. 이때 기존 도구는 두 가지 중 하나를 한다 — 불가능하다고 표시하거나, 비현실적인 저축률을 그대로 출력한다. 둘 다 사용자를 이탈시킨다.</p>
+
+    <p>에이빠는 이 지점에서 <strong>세 변수 중 무엇을 양보할지</strong>를 놓고 대안을 제시한다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:22%">양보 대상</th><th>제시 형태</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>기간</td><td>"목표 금액을 지키려면 3년이 아니라 4년 2개월이 필요하다"</td></tr>
+        <tr><td>금액</td><td>"3년을 지키려면 목표를 2,400만원으로 낮춰야 한다"</td></tr>
+        <tr><td>지출</td><td>"고정지출에서 월 18만원을 줄이면 원래 목표가 가능하다"</td></tr>
+      </tbody>
+    </table>
+
+    <p>선택은 사용자가 한다. 이것이 부모가 실제로 하는 일이고, 계산기가 하지 않는 일이다. <strong>이 협상 대화가 본 서비스의 AI 활용 핵심 지점</strong>이다.</p>
+
+    <h4>목표 자체가 없는 경우</h4>
+
+    <p>더 어려운 경우는 목표 미달이 아니라 <strong>목표 부재</strong>다. "기간은 모르겠고 그냥 돈을 모으고 싶다"는 상태가 여기 해당하며, 1장에서 정의한 문제에 가장 정확히 들어맞는 사용자다. 재무목표 점수 36.1점이 가리키는 것이 바로 이 상태다.</p>
+
+    <p>기존 재무 도구는 목표액과 기간을 필수 입력으로 요구하기 때문에 이 사용자를 첫 화면에서 이탈시킨다. 에이빠는 계산 방향을 뒤집어 대응한다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:26%">모드</th><th style="width:30%">입력</th><th>출력</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>유기한 (역산)</td><td>목표액 + 기간</td><td>필요 월 저축액, 도달 가능 여부</td></tr>
+        <tr><td><b>무기한 (정방향)</b></td><td>저축 가능액만</td><td>금액 구간별 도달 시점, 그중 하나를 목표로 고정 제안</td></tr>
+      </tbody>
+    </table>
+
+    <p>저축 가능액에서 출발해 "이 속도라면 1천만원까지 14개월, 3천만원까지 3년 6개월"을 제시하고, 사용자가 그중 하나를 선택하면 그 시점부터 유기한 모드로 전환한다. <strong>목표가 없는 사용자에게 목표를 만들어주는 것이 이 서비스의 첫 번째 임무</strong>이며, 이는 부가 기능이 아니라 1장의 문제 정의에 직결된 핵심 기능이다.</p>
+
+    <h4>자산 배분을 다루는 방식</h4>
+
+    <p>목표 기간이 확정되면 안전자산과 위험자산의 <strong>비율 범위</strong>를 제시한다. 단기 목표는 원금 보장형 중심, 장기 목표는 위험자산 비중 확대가 가능하다는 일반 원칙을 기간에 따라 적용한다.</p>
+
+    <p>다만 <strong>특정 종목·펀드를 지목하거나 예상 수익률을 단정하지 않는다.</strong> 수익률은 단일 값이 아니라 시나리오 범위로 제시하며, 원금 손실 가능성을 함께 표시한다. 이 제약의 근거는 6장에 있다.</p>
+
+    <h3>4.2 묻지 않아도 먼저 말한다</h3>
+
+    <p>범용 AI 챗봇과의 결정적 차이는 여기에 있다. 챗봇은 사용자가 질문을 떠올려야 작동한다. 그런데 <strong>금융에서 손해가 발생하는 지점은 대부분 질문을 떠올리지 못한 순간</strong>이다. 신청 기간을 몰라서 놓친 정책금융, 만기를 놓쳐 자동 연장된 예금, 계약 전에 확인하지 않은 항목.</p>
+
+    <p>에이빠는 사용자의 목표·기간·계약 정보를 보유하므로, 행동이 필요한 시점을 <strong>선제적으로</strong> 알린다. 실행 캘린더가 이 기능의 근거 구조다.</p>
+
+    <h3>4.3 중개하지 않는다</h3>
+
+    <p>본 서비스는 <strong>특정 금융회사의 상품을 추천하거나 중개하지 않는다.</strong> 목표 설계와 상품 <em>유형</em> 안내까지만 수행하며, 상품 선택과 가입은 사용자가 직접 한다.</p>
+
+    <p>이는 기능 축소가 아니라 설계 원칙이다. 금융소비자보호법상 중개 해당 여부는 설명의 정도, 계약 체결에 미치는 영향, 실무 처리 관여도, 이익 발생 여부를 종합해 판단한다. 등록 없이 상품 추천과 링크 연결을 수행하면 규제 위반 소지가 있다.</p>
+
+    <div class="callout">중개하지 않기 때문에 <strong>수수료 높은 상품을 밀 유인이 없다.</strong> 규제 준수가 곧 사용자 신뢰의 근거가 되는 구조다.</div>
+
+    <p>수익 모델의 단계별 설계와 등록 요건은 6장·7장에서 다룬다.</p>
+
+    <h3>4.4 왜 AI여야 하는가</h3>
+
+    <p>이 대회의 성격상 가장 엄격하게 검증받을 항목이다. 본 서비스는 <strong>결정론적 계산과 언어모델 판단을 명시적으로 분리</strong>한다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:30%">영역</th><th style="width:20%">담당</th><th>이유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>목표 금액 역산, 복리 계산, 월 저축액 산출</td><td><b>자체 로직</b></td><td>숫자는 검증 가능해야 한다. 언어모델에 맡기지 않는다</td></tr>
+        <tr><td>정책금융 자격 판정</td><td><b>자체 로직</b></td><td>규칙이 명문화돼 있어 조건 분기로 처리 가능</td></tr>
+        <tr><td>사용자 상황 해석, 우선순위 판단</td><td><b>Claude API</b></td><td>부채 상환과 저축 중 무엇이 먼저인지는 맥락 의존적 판단</td></tr>
+        <tr><td>목표 미달 시 대안 협상</td><td><b>Claude API</b></td><td>세 변수의 조합은 무한하며, 사용자 반응에 따라 재조정 필요</td></tr>
+        <tr><td>불규칙 소득 패턴 해석</td><td><b>Claude API</b></td><td>고정 규칙으로 처리 불가능한 영역</td></tr>
+        <tr><td>설명 생성</td><td><b>Claude API</b></td><td>같은 결과도 사용자 이해도에 맞춰 다르게 설명해야 한다</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>이 분리가 없으면 두 가지 실패 중 하나가 발생한다.</strong> 전부를 언어모델에 맡기면 금액 계산이 틀리고, 전부를 규칙으로 처리하면 조건 분기 프로그램에 지나지 않아 AI 서비스라 할 수 없다.</p>
+
+    <h3>4.5 경쟁 대비 위치</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:24%">비교 대상</th><th style="width:38%">해당 서비스가 하지 않는 것</th><th>에이빠의 위치</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>가계부·자산 조회 앱</td><td>미래 경로 설계</td><td>과거 기록이 아니라 목표 역산에서 출발</td></tr>
+        <tr><td>대출·예금 비교 플랫폼</td><td>목표 적합성 판단</td><td>상품이 아니라 목표를 먼저 확정</td></tr>
+        <tr><td>로보어드바이저</td><td>저축·부채 단계 설계</td><td>투자 이전 단계를 담당</td></tr>
+        <tr><td>범용 AI 챗봇</td><td>맥락 유지와 선제 알림</td><td>사용자 상태를 보유하고 먼저 말을 건다</td></tr>
+      </tbody>
+    </table>
+
+    <p><span class="tag tag-check">확인 필요</span> — 각 카테고리의 실제 대표 서비스명과 기능 범위는 제출 전 확인해 표를 확정한다.</p>
+  </section>
+
+  <!-- ============ 5장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">05</span>
+      <h2>기술 구조</h2>
+    </div>
+
+    <p class="lede">숫자는 코드가 만들고, 말은 언어모델이 만든다. 이 경계를 흐리는 순간 금융 서비스로서의 자격을 잃는다.</p>
+
+    <h3>5.1 스택</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:22%">계층</th><th style="width:30%">선택</th><th>선정 이유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>프론트엔드</td><td>Next.js (App Router) + TypeScript</td><td>서버 컴포넌트로 계산 로직을 클라이언트에 노출하지 않음</td></tr>
+        <tr><td>스타일</td><td>Tailwind CSS</td><td>단기 개발 일정에서 일관성 확보</td></tr>
+        <tr><td>인증·DB</td><td>Supabase (Auth, PostgreSQL)</td><td>RLS로 행 단위 접근 제어를 DB에서 강제</td></tr>
+        <tr><td>서버 로직</td><td>Supabase Edge Functions</td><td>API 키를 클라이언트에 두지 않기 위함</td></tr>
+        <tr><td>AI</td><td>Claude API</td><td>구조화 출력과 긴 맥락 유지</td></tr>
+        <tr><td>배포</td><td>Vercel</td><td>제출 요건인 배포 URL 확보</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.2 계산 엔진과 언어모델의 분리</h3>
+
+    <p>4장에서 밝힌 원칙을 구현 수준에서 확정한다. 처리 순서는 다음과 같다.</p>
+
+    <ul class="flow">
+      <li data-step="1">
+        <span class="step-title">입력 정규화</span>
+        <span class="step-body">사용자가 입력한 소득·지출·자산·부채를 월 단위 수치로 변환한다. 불규칙 소득은 최솟값·중앙값·최댓값 세 시나리오로 분리한다.</span>
+      </li>
+      <li data-step="2">
+        <span class="step-title">계산 엔진 실행</span>
+        <span class="step-body">목표 금액과 기간으로부터 필요 월 저축액을 역산하고, 현재 여력과의 차액을 산출한다. 도달 가능 여부, 부족액, 대안 3안의 수치를 <b>전부 코드로</b> 계산한다.</span>
+      </li>
+      <li data-step="3">
+        <span class="step-title">언어모델 호출</span>
+        <span class="step-body">엔진이 산출한 수치를 입력으로 넘긴다. 언어모델은 <b>숫자를 생성하지 않고</b>, 주어진 수치의 해석·우선순위 판단·설명만 담당한다.</span>
+      </li>
+      <li data-step="4">
+        <span class="step-title">출력 검증</span>
+        <span class="step-body">응답을 JSON으로 받아 스키마를 검증한다. 엔진이 준 값과 다른 숫자가 포함되면 해당 응답을 폐기하고 재요청한다.</span>
+      </li>
+    </ul>
+
+    <div class="callout">언어모델이 금액을 만들어내지 못하도록 구조 자체로 차단한다. <strong>할루시네이션을 프롬프트로 막는 것이 아니라 아키텍처로 막는다.</strong></div>
+
+    <h4>계산 엔진이 담당하는 항목</h4>
+    <ul>
+      <li>목표 금액 역산 — 목표액, 기간, 기존 자산, 예상 수익률로부터 필요 월 저축액 산출</li>
+      <li>정방향 도달 시점 계산 — 저축 가능액으로부터 금액 구간별 도달 시점 산출 (무기한 모드)</li>
+      <li>복리·단리 계산 및 세후 환산</li>
+      <li>목표 기간에 따른 안전자산·위험자산 비율 범위 산출</li>
+      <li>부채 상환과 저축의 손익분기 비교 — 부채 금리가 저축 금리를 상회하면 상환 우선으로 판정</li>
+      <li>정책금융 자격 필터 — 연령·소득·거주 요건을 조건 분기로 처리</li>
+      <li>실행 캘린더 생성 — 목표 유형별 시기 이벤트 매핑</li>
+    </ul>
+
+    <h4>Claude API가 담당하는 항목</h4>
+    <ul>
+      <li>목표 미달 시 대안 협상 대화 — 사용자 반응에 따른 재조정</li>
+      <li>우선순위 판단 — 엔진의 수치가 팽팽할 때 사용자 상황(고용 안정성, 부양 여부 등)을 반영한 권고</li>
+      <li>불규칙 소득 패턴 해석 — 계절성, 변동 폭에 따른 저축 전략 제안</li>
+      <li>설명 생성 — 동일 결과를 사용자 금융 이해도에 맞춰 서술</li>
+    </ul>
+
+    <h3>5.3 데이터 모델 개요</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:24%">테이블</th><th>보유 항목</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>users</code></td><td>인증 정보 (Supabase Auth 연동)</td></tr>
+        <tr><td><code>goals</code></td><td>목표 유형, 목표 금액, 목표 시점, 용도</td></tr>
+        <tr><td><code>profiles</code></td><td>월 소득 범위, 고정지출 합계, 보유 자산, 부채 잔액·금리</td></tr>
+        <tr><td><code>plans</code></td><td>산출된 월 저축액, 배분 비율, 도달 예상 시점, 선택된 대안</td></tr>
+        <tr><td><code>checkins</code></td><td>월별 실제 저축액, 계획 대비 편차</td></tr>
+        <tr><td><code>events</code></td><td>실행 캘린더 항목, 알림 시점, 처리 여부</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.4 보안과 개인정보</h3>
+
+    <ul>
+      <li><strong>전 테이블 RLS 활성화.</strong> 사용자는 자신의 행에만 접근한다.</li>
+      <li><strong>서비스 키는 서버 전용.</strong> 클라이언트에는 공개 환경변수만 주입한다.</li>
+      <li><strong>수집 항목 최소화.</strong> 계좌번호, 카드번호, 주민등록번호를 수집하지 않는다. 설계에 필요한 것은 금액이지 식별자가 아니다.</li>
+      <li><strong>금융기관 연동 없음.</strong> 마이데이터(본인신용정보관리업)는 허가 사항이므로 연동하지 않으며, 사용자 직접 입력만 사용한다.</li>
+      <li><strong>언어모델 전송 데이터 최소화.</strong> 엔진 산출 수치와 익명화된 상황 요약만 전송하고 식별 정보는 보내지 않는다.</li>
+    </ul>
+
+    <div class="note"><b>설계상 이점.</b> 금융기관 연동이 없기 때문에 유출 시 피해 규모가 구조적으로 제한된다. 기능상 제약이지만 보안 관점에서는 강점이며, 금융보안원 주최 대회의 성격상 명시할 가치가 있다.</div>
+  </section>
+
+  <!-- ============ 6장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">06</span>
+      <h2>규제 검토</h2>
+    </div>
+
+    <p class="lede">금융 서비스 기획에서 가장 자주 생략되는 장이다. 본 기획은 이를 생략하지 않고, 규제 경계선을 제품 설계에 직접 반영했다.</p>
+
+    <h3>6.1 금융소비자보호법상 지위</h3>
+
+    <p>금융소비자보호법은 금융상품을 다루는 사업자를 직접판매업자, 판매대리·중개업자, 자문업자로 구분하고, 이에 해당하는 업을 영위하려면 원칙적으로 금융위원회 등록을 요구한다.</p>
+
+    <p><strong>본 서비스는 세 유형 중 어디에도 해당하지 않도록 설계한다.</strong> 근거는 다음과 같다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:26%">유형</th><th style="width:30%">해당 요건</th><th>본 서비스의 설계</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>직접판매업자</td>
+          <td>금융상품 계약을 직접 체결</td>
+          <td>계약 체결 기능 없음. 자금을 보관·이동하지 않음</td>
+        </tr>
+        <tr>
+          <td>판매대리·중개업자</td>
+          <td>계약 체결을 대리하거나 중개</td>
+          <td>특정 금융회사 상품을 제시·연결하지 않음. 6.2 참조</td>
+        </tr>
+        <tr>
+          <td>자문업자</td>
+          <td>금융상품 취득·처분 결정에 관한 자문</td>
+          <td>개별 상품에 대한 판단을 제공하지 않음. 목표 설계와 상품 <b>유형</b> 설명까지만</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>6.2 중개 해당 여부의 판단 기준</h3>
+
+    <p>금융소비자보호법에는 '중개'의 정의 규정이 없다. 실무상으로는 설명의 정도, 계약 체결에 미치는 영향, 실무 처리 관여도, 이익 발생 여부 등 계약 체결에 관한 제반 사정을 종합해 판단한다.</p>
+
+    <p>이 네 가지 기준을 제품 규칙으로 환산하면 다음과 같다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:48%">서비스가 하는 것</th><th>서비스가 하지 않는 것</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>목표 달성에 필요한 월 저축액 산출</td>
+          <td>특정 금융회사 상품명 추천</td>
+        </tr>
+        <tr>
+          <td>상품 <b>유형</b> 안내 (예: 자유적립식 적금, 주택청약종합저축)</td>
+          <td>상품 가입 페이지 링크 연결</td>
+        </tr>
+        <tr>
+          <td>유형별 일반적 특성과 확인 항목 설명</td>
+          <td>가입 신청 대행 또는 정보 전달</td>
+        </tr>
+        <tr>
+          <td>정책금융 제도의 자격 요건 안내</td>
+          <td>금융회사로부터 성사 수수료 수취</td>
+        </tr>
+        <tr>
+          <td>실행 시점 알림</td>
+          <td>수익성에 따른 노출 순서 조정</td>
+        </tr>
+        <tr>
+          <td>기간에 따른 안전자산·위험자산 <b>비율 범위</b> 제시</td>
+          <td>특정 종목·펀드·상품의 취득 판단 제공</td>
+        </tr>
+        <tr>
+          <td>수익률을 시나리오 범위와 손실 가능성으로 표시</td>
+          <td>예상 수익률을 단일 수치로 단정</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">우측 열을 하나라도 수행하는 순간 등록 대상이 된다. <strong>이 표는 기획 문서가 아니라 개발 단계의 판정 기준으로 사용한다.</strong></div>
+
+    <h3>6.3 확장 시 필요한 등록</h3>
+
+    <p>7장에서 제시하는 3단계 수익 모델로 확장할 경우 등록이 필요하다. 확장 전 충족해야 할 요건을 미리 정리한다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:26%">확장 영역</th><th style="width:30%">필요 조치</th><th>핵심 제약</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>대출 상품 비교·추천</td>
+          <td>온라인 대출모집법인 등록</td>
+          <td>등록 요건에 알고리즘 요건이 포함된다. 소비자 편익을 고려하지 않고 중개수수료가 높은 상품을 우선 배열하는 등의 이해상충 행위를 방지하기 위한 것이다</td>
+        </tr>
+        <tr>
+          <td>예적금 상품 비교·추천</td>
+          <td>예금성 상품 판매중개업자 등록</td>
+          <td>등록 요건은 대출성 상품 판매중개업 기준을 참고해 마련됐다. 적합성·적정성 원칙 준수와 이해상충 행위 금지 등 규제도 대부분 동일하게 적용된다</td>
+        </tr>
+        <tr>
+          <td>금융기관 데이터 연동</td>
+          <td>본인신용정보관리업 허가</td>
+          <td>허가제이므로 자본금·전산설비 등 요건 충족 필요. 초기 단계에서는 추진하지 않는다</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>주목할 점은 예금이 대출보다 규제가 가볍지 않다는 것이다.</strong> "예적금 유도는 상대적으로 자유롭다"는 통념은 성립하지 않는다. 본 기획이 1단계에서 중개를 배제한 이유가 여기에 있다.</p>
+
+    <h3>6.4 그 밖의 준수 사항</h3>
+
+    <ul>
+      <li><strong>개인정보보호법 최소수집 원칙</strong> — 5.4에 기술한 대로 식별 정보를 수집하지 않는다.</li>
+      <li><strong>투자 권유 회피</strong> — 특정 종목·펀드에 대한 판단을 제공하지 않는다. 위험자산은 유형 수준에서만 언급한다.</li>
+      <li><strong>면책 고지</strong> — 산출 결과가 확정된 수익이나 보장이 아님을 결과 화면에 상시 표시한다.</li>
+      <li><strong>취약 상태 전환</strong> — 연체·과다채무가 감지되면 설계를 중단하고 신용회복위원회 등 공적 기관 안내로 전환한다.</li>
+    </ul>
+
+    <div class="note"><span class="tag tag-check">확인 필요</span> 본 장은 공개된 법령과 금융당국 보도자료를 근거로 작성한 것으로, 법률 자문이 아니다. 사업화 단계에서는 금융위원회 유권해석과 법률 검토를 거쳐 확정한다.</div>
+  </section>
+
+  <!-- ============ 7장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">07</span>
+      <h2>수익 모델</h2>
+    </div>
+
+    <p class="lede">중립성이 이 서비스의 유일한 자산이다. 따라서 수익 구조는 중립성을 훼손하지 않는 순서로만 확장한다.</p>
+
+    <h3>7.1 설계 원칙</h3>
+
+    <p>이 서비스가 사용자에게 해야 하는 조언 중에는 <strong>"지금은 사지 마라", "이 상품은 당신에게 필요 없다"</strong>가 포함된다. 상품 성사에서 수익이 발생하는 구조에서는 이 조언이 나올 수 없다. 그러므로 초기 단계에서 상품 연계 수익을 배제한다.</p>
+
+    <div class="callout">사용자와 이해가 충돌하지 않는 지불 주체를 먼저 찾고, 그다음에 규제를 충족한 상태에서 상품 연계로 넘어간다. <strong>순서를 뒤집으면 서비스의 근거가 무너진다.</strong></div>
+
+    <h3>7.2 3단계 확장</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:14%">단계</th><th style="width:22%">수익원</th><th style="width:20%">지불 주체</th><th>전환 조건</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>1단계</b><br>검증</td>
+          <td>없음 (전면 무료)</td>
+          <td>—</td>
+          <td>목표 설정 완료율과 3개월 유지율로 유효성 검증</td>
+        </tr>
+        <tr>
+          <td><b>2단계</b><br>기관 공급</td>
+          <td>도입·운영비</td>
+          <td>지자체, 대학, 기업</td>
+          <td>1단계 지표 확보 후 레퍼런스 기관 확보</td>
+        </tr>
+        <tr>
+          <td><b>3단계</b><br>상품 연계</td>
+          <td>중개 수수료</td>
+          <td>금융회사</td>
+          <td>법인 설립 및 6.3의 등록 완료</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>7.3 2단계가 성립하는 이유</h3>
+
+    <p>청년 금융교육은 이미 여러 기관의 <strong>기존 예산 항목</strong>이다. 한국은행과 금융감독원은 2024년 조사 결과를 발표하며 취약계층의 금융접근성을 높이고 수요자 니즈를 고려한 맞춤형 금융교육 콘텐츠를 지원할 계획을 밝혔고, 시중은행과 보험사도 사회초년생 대상 금융교육을 늘리고 있다.</p>
+
+    <p>즉 새로운 예산을 설득하는 것이 아니라, <strong>이미 집행되고 있는 교육 예산의 전달 방식을 바꾸는 것</strong>이다. 일회성 강의 대신 개인별 설계 도구를 제공하는 형태다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:24%">채널</th><th style="width:32%">기존 집행 형태</th><th>대체 제안</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>지자체 청년정책</td><td>청년 금융교육 강좌, 재무상담 바우처</td><td>목표 설계 도구 도입 및 이용 실적 리포트</td></tr>
+        <tr><td>대학 학생복지</td><td>취업 특강, 신입생 오리엔테이션</td><td>재학생 대상 계정 제공, 학교 단위 익명 통계</td></tr>
+        <tr><td>기업 사내복지</td><td>신입사원 재테크 교육</td><td>입사자 온보딩 패키지에 포함</td></tr>
+      </tbody>
+    </table>
+
+    <p><span class="tag tag-hypo">가설</span> 위 세 채널의 실제 구매 의사와 단가는 검증되지 않았다. 1단계에서 확보한 이용 지표로 설득 가능한지가 관건이다.</p>
+
+    <h3>7.4 3단계에서 지켜야 할 것</h3>
+
+    <p>상품 연계로 확장하더라도 배열 순서를 수수료가 아닌 사용자 목표 적합도로 결정한다는 원칙은 유지한다. 이는 선택이 아니라 6.3에 정리한 등록 요건이 요구하는 사항이기도 하다.</p>
+
+    <ul>
+      <li>추천 근거와 수수료 수취 사실을 화면에 명시</li>
+      <li>배열 알고리즘의 기준 공개</li>
+      <li>"가입하지 않는 것이 낫다"는 결론이 나올 수 있는 구조 유지</li>
+    </ul>
+
+    <h3>7.5 검증 지표</h3>
+
+    <p>1단계에서 수집할 지표를 미리 정의한다. 수익이 없는 단계이므로, 이 지표가 유일한 성과 증거가 된다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:34%">지표</th><th>측정 이유</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>목표 설정 완료율</td><td>1장에서 정의한 문제(재무목표 36.1점)를 실제로 해소하는지</td></tr>
+        <tr><td>대안 협상 수용률</td><td>4.1의 핵심 기능이 작동하는지</td></tr>
+        <tr><td>3개월 체크인 유지율</td><td>계획이 유지되는지. 이탈 후 복귀율 포함</td></tr>
+        <tr><td>선제 알림 실행률</td><td>4.2의 기능이 실제 행동으로 이어지는지</td></tr>
+      </tbody>
+    </table>
+
+    <p><span class="tag tag-check">확인 필요</span> 목표 수치는 대회 제출 시점의 실사용 데이터가 없으므로 설정하지 않는다. 8장 실행 계획에서 측정 방법만 기술한다.</p>
+  </section>
+
+  <!-- ============ 8장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">08</span>
+      <h2>실행 계획</h2>
+    </div>
+
+    <p class="lede">제출 요건은 기획서가 아니라 동작하는 배포 URL이다. 따라서 일정은 기능 목록이 아니라 절단 기준으로 관리한다.</p>
+
+    <h3>8.1 일정</h3>
+
+    <p>접수 마감은 2026년 9월 7일 오전 10시다. 작성 기준일로부터 가용 개발 기간은 11일이며, 각 구간은 구현 → 테스트 → 실패 분석 → 수정 → 재테스트 순으로 처리하고 <strong>테스트를 통과하지 못한 구간은 다음으로 넘기지 않는다.</strong></p>
+
+    <table>
+      <thead>
+        <tr><th style="width:18%">구간</th><th style="width:26%">산출물</th><th>완료 판정 기준</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>8/27~8/28</b><br>설계 확정</td>
+          <td>계산 엔진 명세, DB 스키마, 화면 와이어</td>
+          <td>목표 역산 공식이 문서로 확정되고 테스트 케이스 10건이 작성됨</td>
+        </tr>
+        <tr>
+          <td><b>8/29~9/1</b><br>코어 구현</td>
+          <td>계산 엔진, 화면 3개 (목표 선택 · 조건 입력 · 설계 결과)</td>
+          <td>테스트 케이스 10건 전부 통과. AI 없이도 설계 결과가 출력됨</td>
+        </tr>
+        <tr>
+          <td><b>9/2~9/4</b><br>AI 연동 및 배포</td>
+          <td>협상 대화, 실행 캘린더, Vercel 1차 배포</td>
+          <td><b>9월 4일까지 접속 가능한 URL 확보</b>. 이 시점을 넘기면 범위를 절단한다</td>
+        </tr>
+        <tr>
+          <td><b>9/5~9/6</b><br>검증 및 문서</td>
+          <td>기능명세서, 기획서 최종본, 시나리오 테스트</td>
+          <td>외부 인원 3명이 사전 안내 없이 목표 설정을 완료함</td>
+        </tr>
+        <tr>
+          <td><b>9/7 10:00</b><br>제출</td>
+          <td>기획서 + 기능명세서 + 배포 URL</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>9월 4일을 배포 마감으로 잡은 것은 <strong>사전 검토 통과가 모든 평가의 전제</strong>이기 때문이다. 기능이 부족한 상태로 배포하는 것이, 완성도 높은 상태로 배포하지 못하는 것보다 낫다.</p>
+
+    <h3>8.2 역할 분담</h3>
+
+    <p><span class="tag tag-check">확인 필요</span> 3인 팀을 전제로 작성했다. 대회 규정상 4인 이하 팀이 가능하다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:20%">역할</th><th style="width:36%">담당</th><th>산출</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>개발 총괄</td><td>계산 엔진, Supabase 스키마·RLS, Claude API 연동, 배포</td><td>동작하는 서비스</td></tr>
+        <tr><td>프론트·QA</td><td>화면 구현, 시나리오 테스트, 입력 검증</td><td>화면 5개, 테스트 결과서</td></tr>
+        <tr><td>문서·발표</td><td>기획서, 기능명세서, 발표자료, 근거 리서치</td><td>제출 문서 3종</td></tr>
+      </tbody>
+    </table>
+
+    <h3>8.3 범위 절단 기준</h3>
+
+    <p>일정이 밀릴 경우 아래 순서로 잘라낸다. 이 목록을 사전에 확정해 두는 것이 일정 관리의 핵심이다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:16%">구분</th><th style="width:40%">기능</th><th>판단 근거</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>반드시</b></td>
+          <td>목표 설정(유기한·무기한 분기), 조건 입력, 설계 결과, 대안 협상 대화</td>
+          <td>이 넷이 없으면 4장의 차별점이 증명되지 않는다. 무기한 모드는 1장 문제 정의와 직결되므로 제외 대상이 아니다</td>
+        </tr>
+        <tr>
+          <td><b>가능하면</b></td>
+          <td>실행 캘린더, 월별 체크인</td>
+          <td>4.2의 선제 알림 근거이나 데모 없이 설명으로 대체 가능</td>
+        </tr>
+        <tr>
+          <td><b>제외</b></td>
+          <td>이메일·푸시 발송, 소셜 로그인 확장, 다국어, 차트 고도화</td>
+          <td>심사 평가에 기여하지 않으면서 일정을 잠식한다</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>8.4 리스크 대응</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:30%">리스크</th><th style="width:12%">영향</th><th>대응</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>계산 엔진 산출값 오류</td>
+          <td>치명</td>
+          <td>테스트 케이스 10건을 수기 검산해 고정. 회귀 테스트로 상시 검증</td>
+        </tr>
+        <tr>
+          <td>언어모델 응답이 스키마를 벗어남</td>
+          <td>높음</td>
+          <td>검증 실패 시 재요청. 3회 실패하면 엔진 산출값만 표시하는 폴백으로 전환</td>
+        </tr>
+        <tr>
+          <td>배포 지연</td>
+          <td>치명</td>
+          <td>9/4를 절대 마감으로 두고 8.3의 제외 목록을 즉시 적용</td>
+        </tr>
+        <tr>
+          <td>공공 API 이용 조건 미충족</td>
+          <td>중간</td>
+          <td>금리·정책금융 데이터를 정적 데이터셋으로 내장해 대체. 갱신일 명시</td>
+        </tr>
+        <tr>
+          <td>규제 경계 판단 오류</td>
+          <td>높음</td>
+          <td>6.2의 판정 표를 개발 체크리스트로 사용. 우측 열 항목은 코드 리뷰에서 차단</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>8.5 발표 심사 대비</h3>
+
+    <p>상위 팀은 발표 심사에서 코드와 발표자료를 사전 제출한다. 예상 질문과 답변 지점을 미리 확정한다.</p>
+
+    <ul>
+      <li><strong>"AI가 왜 필요한가"</strong> → 4.4절 분리표. 숫자는 엔진, 판단은 언어모델</li>
+      <li><strong>"기존 재무 계산기와 무엇이 다른가"</strong> → 4.1절. 도달 불가능할 때 협상하는 기능을 실연</li>
+      <li><strong>"수익은 어떻게 내는가"</strong> → 7.2절 3단계. 초기 중개 배제가 규제 회피가 아니라 설계 원칙임을 설명</li>
+      <li><strong>"규제 문제는 검토했는가"</strong> → 6장 전체. 대부분의 팀이 답하지 못하는 질문이다</li>
+    </ul>
+
+    <div class="callout">발표 데모는 <strong>한 장면으로 고정한다.</strong> 목표가 도달 불가능하다고 나온 뒤, 대안 3안을 제시하고 사용자가 하나를 고르자 계획이 다시 계산되는 장면이다.</div>
+  </section>
+
+  <!-- ============ 9장 ============ -->
+  <section class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">09</span>
+      <h2>기대효과</h2>
+    </div>
+
+    <p class="lede">이 서비스가 성공했다는 것은 사용자가 금융 상품을 더 많이 가입했다는 뜻이 아니라, 재무 목표를 가진 사람이 늘었다는 뜻이다.</p>
+
+    <h3>9.1 직접 효과</h3>
+
+    <p>1장에서 정의한 문제와 7.5절의 지표는 일대일로 대응한다. 본 서비스가 겨냥하는 것은 금융이해력 조사의 <strong>금융행위 부문, 그중에서도 재무목표 설정과 재무점검 항목</strong>이다.</p>
+
+    <table>
+      <thead>
+        <tr><th style="width:32%">문제 (1장)</th><th style="width:30%">기능 (3~4장)</th><th>측정 (7.5)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>목표를 세우지 못한다<br><span style="color:#5D6572;font-size:13px">재무목표 36.1점</span></td><td>목표를 먼저 묻는 진입 흐름</td><td>목표 설정 완료율</td></tr>
+        <tr><td>목표와 현실 사이 경로가 없다</td><td>계산 엔진 역산, 대안 협상</td><td>대안 협상 수용률</td></tr>
+        <tr><td>이탈하면 포기한다<br><span style="color:#5D6572;font-size:13px">재무점검 33.2점</span></td><td>월별 체크인, 경로 재계산</td><td>3개월 유지율</td></tr>
+        <tr><td>때를 놓친다</td><td>실행 캘린더, 선제 알림</td><td>알림 실행률</td></tr>
+      </tbody>
+    </table>
+
+    <p><span class="tag tag-check">확인 필요</span> 목표 수치는 실사용 데이터 확보 후 설정한다. 제출 시점에는 측정 체계만 구축된 상태다.</p>
+
+    <h3>9.2 사회적 효과</h3>
+
+    <h4>금융 격차의 세습 완화</h4>
+    <p>1.2절에서 서술한 대로, 금융 계획 능력은 현재 가정 단위로 전수된다. 본 서비스는 그 역할을 제도 바깥에서 대체하는 시도이며, 가정 환경과 무관하게 동일한 설계 절차를 제공한다.</p>
+
+    <h4>취약 집단 금융접근성</h4>
+    <p>2024년 조사에서 청년층·노령층·저소득층의 점수가 하락하며 계층별 격차가 확대된 것으로 나타났다. 본 서비스는 그중 청년층을 1차 대상으로 삼되, 설계 구조 자체는 대상 집단 교체가 가능하다. 목표 유형과 이벤트 캘린더만 교체하면 고령층 은퇴 설계, 외국인 정착 자금 설계로 확장된다.</p>
+
+    <h4>규제 준수형 AI 금융서비스의 사례</h4>
+    <p>6장에서 정리한 대로, 본 기획은 규제 경계를 우회하지 않고 제품 설계에 반영했다. AI 금융서비스가 확산되는 국면에서 <strong>등록 없이도 합법적으로 제공 가능한 기능 범위</strong>를 구체적으로 제시한 사례로서의 의미가 있다.</p>
+
+    <h3>9.3 확장 가능성</h3>
+
+    <table>
+      <thead>
+        <tr><th style="width:26%">축</th><th style="width:32%">확장 내용</th><th>필요 조건</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>대상 확대</td><td>고령층 은퇴 설계, 외국인 정착 설계</td><td>목표 유형·캘린더 교체</td></tr>
+        <tr><td>기관 공급</td><td>지자체·대학·기업 단위 도입</td><td>익명 통계 리포트 기능 추가</td></tr>
+        <tr><td>데이터 축적</td><td>익명화된 청년 재무 실태 지표</td><td>표본 규모 확보, 동의 절차 정비</td></tr>
+        <tr><td>상품 연계</td><td>중개 수수료 모델</td><td>법인 설립 및 6.3의 등록</td></tr>
+      </tbody>
+    </table>
+
+    <p>세 번째 축이 장기적으로 가장 큰 가치를 가질 수 있다. 현재 청년 재무 실태는 2년 주기 표본 설문으로만 파악되는데, 본 서비스는 <strong>목표와 실행 편차를 상시 관측</strong>한다. <span class="tag tag-hypo">가설</span> 다만 유의미한 표본에 도달하기 전에는 성립하지 않으며, 이용자 동의와 익명화 절차가 선행되어야 한다.</p>
+
+    <h3>9.4 한계</h3>
+
+    <p>본 기획이 해결하지 못하는 것을 명시한다.</p>
+
+    <ul>
+      <li><strong>소득 자체를 늘리지 못한다.</strong> 계획은 주어진 소득 안에서만 작동한다. 소득이 고정지출을 넘지 못하는 사용자에게는 설계가 아니라 복지 연계가 필요하며, 서비스는 이 경우 공적 제도 안내로 전환한다.</li>
+      <li><strong>실행을 강제하지 못한다.</strong> 알림과 재계산은 행동을 유도할 뿐이며, 실제 저축 여부는 확인할 수 없다. 사용자 자기 보고에 의존한다.</li>
+      <li><strong>입력 정확도에 의존한다.</strong> 금융기관 연동을 하지 않으므로 사용자가 부정확하게 입력하면 설계도 부정확해진다. 5.4의 보안상 이점과 맞바꾼 제약이다.</li>
+    </ul>
+
+    <div class="note"><b>맺음.</b> 이 서비스가 하려는 일은 금융 지식을 가르치는 것이 아니라, <b>지금 무엇을 해야 하는지 순서를 알려주는 것</b>이다. 그 역할은 원래 누군가의 아빠가 해왔고, 모두에게 그 아빠가 있지는 않았다.</div>
+  </section>
+
+  <footer>
+    <p>1~9장 완결. 제출 전 [확인 필요] 7건과 [가설] 3건을 검증해 확정한다.<br>
+    <span class="tag tag-check">확인 필요</span> 표시는 근거 확인이 필요한 항목, <span class="tag tag-hypo">가설</span> 표시는 검증되지 않은 주장이다.<br>
+    6장은 공개 법령과 금융당국 보도자료에 근거한 정리이며 법률 자문이 아니다.<br>
+    주요 통계 출처: 한국은행·금융감독원 「2024 전국민 금융이해력 조사」(2025.04.29 발표).</p>
+  </footer>
+
+</div>
+</body>
+</html>
