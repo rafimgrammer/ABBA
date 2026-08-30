@@ -1,0 +1,1004 @@
+<title>ABBA 2.0 시안</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 디자인 토큰 — 색만 여기서 바꾼다. 팀컬러 변경은 --p 계열만 손대면 된다. */
+:root{
+  --p:#0F766E;--pp:#115E59;--ps:#E6F4F1;
+  --bg:#F4F6F8;--sf:#FFFFFF;--sf2:#F5F6F9;--ln:#E6E8EC;
+  --t1:#17202A;--t2:#4B5563;--t3:#8A94A0;--t4:#B3BAC3;
+  --up:#E5484D;--down:#2F6FED;--ok:#1F9D55;--warn:#D9760C;--bad:#E5484D;
+  --a1:#0F766E;--a2:#5EB5A8;--a3:#7C8DB5;--a4:#F0A63A;
+}
+/* 리셋·프레임·상단 띠·헤더·본문 여백. 화면 골격. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--t1);font-family:Pretendard,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body{min-height:100dvh}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit}
+.frame{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column}
+@media(min-width:600px){body{background:#E9ECF0}.frame{box-shadow:0 0 0 1px var(--ln)}}
+
+.strip{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;background:#17202A;color:#C9D1D9;font-size:12px;height:34px}
+.strip b{color:#fff;font-weight:600}
+.strip button{background:transparent;border:1px solid #4B5563;color:#fff;border-radius:999px;padding:3px 10px;font-size:12px;white-space:nowrap;flex-shrink:0}
+
+.top{display:flex;align-items:center;gap:4px;height:52px;padding:0 8px;position:sticky;top:34px;background:var(--bg);z-index:20}
+.top .ib{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;border-radius:12px;color:var(--t1)}
+.top h2{font-size:17px;font-weight:600;flex:1}
+.top .prog{font-size:13px;color:var(--t3);font-variant-numeric:tabular-nums;padding-right:8px}
+.bar{height:3px;background:var(--ln);margin:0 16px}
+.bar i{display:block;height:100%;background:var(--p);transition:width .2s}
+/* 재사용 UI — 카드·버튼·CTA·탭바·배지·시트·토스트. */
+
+.main{padding:8px 16px 150px;flex:1}
+h1{font-size:22px;font-weight:700;line-height:1.35;letter-spacing:-.2px;margin:8px 0 14px}
+.card{background:var(--sf);border-radius:18px;padding:18px 16px;margin-bottom:12px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card h3 svg{color:var(--p)}
+.sub{color:var(--t2);font-size:13px;line-height:1.55}
+.muted{color:var(--t3);font-size:12px;line-height:1.5}
+.big{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.2}
+.mid{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--sf2);color:var(--t2);white-space:nowrap}
+.pill.ok{background:#E3F5EA;color:#157A43}.pill.warn{background:#FCEFDF;color:#A85A08}.pill.bad{background:#FDE8E9;color:#B4232A}.pill.info{background:var(--ps);color:var(--p)}
+.hr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--ln);font-size:14px}
+.row.first{border-top:0;padding-top:0}
+.row .k{color:var(--t2)}
+.row .v{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:56px;border:0;border-radius:16px;background:var(--p);color:#fff;font-size:16px;font-weight:600}
+.btn:active{background:var(--pp)}
+.btn:disabled{background:#D5DAE0;color:#fff;cursor:default}
+.btn.ghost{background:var(--sf);color:var(--t1);border:1px solid var(--ln)}
+.btn.sm{height:38px;font-size:13px;border-radius:11px;width:auto;padding:0 12px;flex-shrink:0}
+.btn.sm.ghost{background:var(--sf)}
+.cta{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(244,246,248,0),var(--bg) 35%);z-index:25}
+.cta.tabbed{bottom:66px}
+.cta .sub2{display:block;text-align:center;margin-top:10px;color:var(--t2);font-size:13px;background:transparent;border:0}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;display:flex;background:var(--sf);border-top:1px solid var(--ln);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:26}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;color:var(--t3);font-size:11px;font-weight:500;text-decoration:none}
+.tabbar a.on{color:var(--p);font-weight:600}
+.link{background:transparent;border:0;color:var(--p);font-weight:600;font-size:13px;padding:0}
+.note{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sf2);font-size:12px;color:var(--t2);line-height:1.5;margin-top:10px}
+.note svg{flex-shrink:0;color:var(--t3);margin-top:1px}
+.tagx{display:inline-block;font-size:11px;font-weight:600;padding:1px 6px;border-radius:5px;background:var(--sf2);color:var(--t2);vertical-align:1px;margin-left:4px}
+.tagx.need{background:#FCEFDF;color:#A85A08}
+.tagx.plan{background:var(--ps);color:var(--p)}
+
+
+/* sheet & toast */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:430px;background:var(--sf);border-radius:20px 20px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h4{font-size:15px;font-weight:600;margin:4px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.sheet a{display:flex;justify-content:space-between;align-items:center;padding:13px 4px;border-top:1px solid var(--ln);text-decoration:none;font-size:15px;font-weight:500}
+.sheet a span{font-size:12px;color:var(--t3);font-weight:400}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;background:#17202A;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;z-index:50;white-space:nowrap}
+.fade{animation:fade .18s ease-out}
+/* 화면별 스타일 — 시작·대화·계획·브리핑·설정. */
+/* start */
+.hero{padding:34px 4px 18px}
+.brand{font-size:13px;font-weight:700;color:var(--p);letter-spacing:.2px;margin-bottom:10px}
+.hero h1{font-size:28px;margin:0 0 12px}
+.hero p{color:var(--t2);font-size:15px;line-height:1.6}
+.steps{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--sf);border-radius:16px;padding:14px}
+.step .n{width:26px;height:26px;border-radius:50%;background:var(--ps);color:var(--p);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step b{display:block;font-size:14px;font-weight:600;margin-bottom:2px}
+.step span{font-size:13px;color:var(--t2);line-height:1.5}
+
+/* chat */
+.log{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
+.msg{display:flex;gap:8px;max-width:90%}
+.msg.ai{align-self:flex-start}
+.msg.me{align-self:flex-end;justify-content:flex-end}
+.av{width:28px;height:28px;border-radius:50%;background:var(--p);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.bub{padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.5;white-space:pre-line;word-break:keep-all}
+.ai .bub{background:var(--sf);border-top-left-radius:6px}
+.me .bub{background:var(--p);color:#fff;border-top-right-radius:6px}
+.typing{display:inline-flex;gap:4px;padding:15px 16px}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--t4);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.composer{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;background:var(--sf);border-top:1px solid var(--ln);padding:10px 12px calc(10px + env(safe-area-inset-bottom));z-index:25}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{border:1px solid var(--ln);background:var(--sf);border-radius:999px;padding:8px 13px;font-size:14px;color:var(--t1);text-align:left;line-height:1.3}
+.chip:active,.chip.sel{background:var(--ps);border-color:var(--p);color:var(--p)}
+.chip small{display:block;font-size:11px;color:var(--t3);font-weight:400}
+.chip.wide{border-radius:14px;padding:9px 13px}
+.irow{display:flex;align-items:center;gap:8px}
+.field{flex:1;display:flex;align-items:center;gap:6px;height:48px;border:1.5px solid var(--ln);border-radius:14px;padding:0 12px;background:var(--sf2)}
+.field:focus-within{border-color:var(--p);background:var(--sf)}
+.field input{flex:1;min-width:0;border:0;background:transparent;font-size:18px;font-weight:600;font-family:inherit;text-align:right;outline:0;font-variant-numeric:tabular-nums;color:var(--t1)}
+.field span{color:var(--t3);font-size:14px;flex-shrink:0}
+.send{width:48px;height:48px;border-radius:14px;border:0;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send:disabled{background:#D5DAE0;cursor:default}
+.help{font-size:12px;color:var(--t3);margin-top:6px;min-height:16px;display:flex;justify-content:space-between;gap:8px}
+.help.err{color:var(--bad)}
+.seg{display:flex;background:var(--sf2);border-radius:12px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:transparent;padding:8px;border-radius:10px;font-size:13px;font-weight:500;color:var(--t2)}
+.seg button.on{background:var(--sf);color:var(--t1);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
+.undo{background:transparent;border:0;color:var(--t3);font-size:12px;padding:0;display:inline-flex;align-items:center;gap:2px}
+
+/* plan */
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 12px;background:var(--sf2)}
+.stack i{display:block;height:100%}
+.c1{background:var(--a1)}.c2{background:var(--a2)}.c3{background:var(--a3)}.c4{background:var(--a4)}
+.dot{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+.arow{display:grid;grid-template-columns:12px 1fr auto;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--ln);font-size:14px}
+.arow .r1{display:flex;align-items:center;gap:6px;font-weight:600}
+.arow .r2{grid-column:2/4;font-size:12px;color:var(--t3);display:flex;justify-content:space-between;gap:4px 10px;flex-wrap:wrap}
+.arow .r2 span{white-space:nowrap}
+.arow .amt{font-weight:600;font-variant-numeric:tabular-nums}
+.progbar{height:8px;border-radius:4px;background:var(--sf2);overflow:hidden;margin:10px 0 6px}
+.progbar i{display:block;height:100%;background:var(--p);border-radius:4px}
+.alt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--ln);border-radius:14px;margin-top:8px}
+.alt.rec{border-color:var(--p);background:var(--ps)}
+.alt.off{opacity:.55}
+.alt b{display:block;font-size:14px;font-weight:600}
+.alt span{font-size:12px;color:var(--t2)}
+.alt .rectag{font-size:11px;font-weight:700;color:var(--p);margin-right:4px}
+details{margin-top:10px}
+summary{cursor:pointer;font-size:13px;color:var(--p);font-weight:600;list-style:none;display:flex;align-items:center;gap:4px}
+summary::-webkit-details-marker{display:none}
+details .body{margin-top:10px;font-size:13px;color:var(--t2);line-height:1.6}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{padding:8px 4px;text-align:right;border-top:1px solid var(--ln);font-variant-numeric:tabular-nums}
+th{color:var(--t3);font-weight:500}
+td:first-child,th:first-child{text-align:left}
+.segp{display:flex;background:var(--sf2);border-radius:14px;padding:4px;margin-bottom:12px}
+.segp button{flex:1;border:0;background:transparent;padding:10px 4px;border-radius:11px;font-size:14px;font-weight:500;color:var(--t2)}
+.segp button.on{background:var(--sf);color:var(--t1);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
+.opts{display:flex;gap:8px;margin-top:10px}
+.opt{flex:1;border:1.5px solid var(--ln);border-radius:14px;padding:10px 8px;background:var(--sf);text-align:center}
+.opt.sel{border-color:var(--p);background:var(--ps)}
+.opt b{display:block;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.opt span{font-size:12px;color:var(--t3)}
+
+/* brief */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:#FCEFDF;color:#A85A08}
+.tick{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--ln)}
+.tick.first{border-top:0;padding-top:0}
+.tick b{display:block;font-size:14px;font-weight:600}
+.tick span{font-size:12px;color:var(--t3)}
+.chg{font-weight:700;font-variant-numeric:tabular-nums;font-size:15px;text-align:right}
+.chg.up{color:var(--up)}.chg.down{color:var(--down)}.chg.flat{color:var(--t2)}
+.chg small{display:block;font-size:11px;font-weight:600;color:var(--warn)}
+.news{padding:9px 0;border-top:1px solid var(--ln);font-size:13px;display:flex;gap:8px;align-items:flex-start;justify-content:space-between;line-height:1.45}
+.tag{flex-shrink:0;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px}
+.tag.good{background:#FDE8E9;color:#B4232A}.tag.badn{background:#E3ECFD;color:#1F4FB8}.tag.neu{background:var(--sf2);color:var(--t2)}
+.aisay{display:flex;gap:8px;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--ps);font-size:13px;line-height:1.5;color:var(--t1)}
+.aisay .av{width:22px;height:22px;font-size:9px;margin-top:1px}
+.spark{width:100%;height:110px;display:block;margin-top:6px}
+.lgd{display:flex;gap:12px;font-size:11px;color:var(--t3);margin-top:4px}
+.lgd i{display:inline-block;width:14px;height:0;border-top:2px solid;vertical-align:middle;margin-right:4px}
+.todo{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--ln);font-size:14px}
+.todo.first{border-top:0;padding-top:0}
+.todo .chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--t4);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;color:#fff}
+.todo .chk.on{background:var(--p);border-color:var(--p)}
+.todo span{font-size:12px;color:var(--t3);display:block}
+
+/* settings & data */
+.sw{width:44px;height:26px;border-radius:13px;background:#D5DAE0;position:relative;border:0;flex-shrink:0;transition:background .15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.sw.on{background:var(--p)}.sw.on::after{left:21px}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--ln)}
+.srow.first{border-top:0;padding-top:0}
+.srow b{display:block;font-size:14px;font-weight:600}
+.srow span{font-size:12px;color:var(--t3);line-height:1.4}
+.mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.mini button{border:1px solid var(--ln);background:var(--sf);border-radius:999px;padding:5px 10px;font-size:12px;color:var(--t2)}
+.mini button.on{border-color:var(--p);color:var(--p);background:var(--ps);font-weight:600}
+.src{padding:12px 0;border-top:1px solid var(--ln)}
+.src.first{border-top:0;padding-top:0}
+.src b{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;margin-bottom:4px}
+.src p{font-size:12px;color:var(--t2);line-height:1.5}
+.src .meta{display:flex;gap:10px;font-size:11px;color:var(--t3);margin-top:4px;flex-wrap:wrap}
+</style>
+<div class="frame" id="app"></div>
+<div id="layer"></div>
+<script>
+/* ===== config.js ===== */
+// 서비스 상수와 계산 가정값. 숫자를 바꾸려면 여기만 고친다.
+// [가정] 2026-08 기준. 본 구현에서는 금융감독원 공시 API 값으로 대체한다.
+
+const APP = { name: 'ABBA 2.0', version: '1.3', stage: '시안 · 팀 공유판' };
+
+const M = 10000; // 만 원 → 원
+
+// 연 수익률(세전). 적금만 단리, 나머지는 월복리.
+const RATES = { 적금: 0.035, 예금: 0.032, 채권: 0.040, 주식: 0.075 };
+const TAX = 0.154;                       // 이자·배당소득세
+const KEYS = ['적금', '예금', '채권', '주식'];
+// 성향별 기본 배분(%) — 적금·예금·채권·주식
+const BASE = { 안정형: [50, 30, 15, 5], 중립형: [35, 15, 20, 30], 공격형: [20, 10, 15, 55] };
+const LTV = 0.70, LOAN_RATE = 0.040, LOAN_YEARS = 30; // 집 목표 대출 가정
+
+// 입력 한계 — 음수·0·비현실적 값 차단에 쓴다
+const LIMITS = {
+  months: { min: 1, max: 600 },
+  amount: { min: 10 * M },          // 목표 금액
+  house:  { min: 1000 * M },        // 집값
+  income: { min: 10 * M, max: 100000 * M },
+  money:  { min: 0, max: 100000 * M },
+  digits: 9,
+};
+
+// 화면 목록 시트에 노출할 팀 문서
+const DOCS = [
+  { title: '우승 전략 · 9일 계획', desc: '결정 6개 · 역할 · 일정 · 제출 체크', url: 'https://claude.ai/code/artifact/f4e1575b-b190-4717-a29b-4b65f5745a1e' },
+  { title: '기획서 v3', desc: '공식 7항목 · 노란 표시 기입 필요', url: 'https://claude.ai/code/artifact/6426b5aa-26b0-47b4-a4d0-4d067f4a18a9' },
+  { title: '기능명세서 초안', desc: '기능 36개', url: 'https://claude.ai/code/artifact/4ed3c481-63ea-47cc-80d9-18a0d550d402' },
+  { title: '데이터 모델 v1.1', desc: '19개 테이블 · RLS · 파이프라인', url: 'https://claude.ai/code/artifact/03a1e7ac-970f-448b-8dc9-2c98fdc03ee6' },
+];
+
+/* ===== utils.js ===== */
+// 숫자·통화·날짜 포맷과 DOM 헬퍼.
+
+const $ = (s, el = document) => el.querySelector(s);
+
+const fmt = n => Number(n).toLocaleString('ko-KR');
+
+function won(v, dec) {
+  v = Math.round(v); const neg = v < 0; v = Math.abs(v); let s;
+  if (v >= 1e8) {
+    let eok = Math.floor(v / 1e8); let man = Math.round((v % 1e8) / M);
+    if (man === 10000) { eok += 1; man = 0; }
+    s = man ? `${fmt(eok)}억 ${fmt(man)}만 원` : `${fmt(eok)}억 원`;
+  } else if (v >= M) {
+    const man = v / M;
+    s = (dec && Math.round(man * 10) % 10) ? `${fmt(Math.round(man * 10) / 10)}만 원` : `${fmt(Math.round(man))}만 원`;
+  } else s = `${fmt(v)}원`;
+  return (neg ? '-' : '') + s;
+}
+
+const TODAY = new Date();
+
+function ymAdd(n) { const t = new Date(TODAY.getFullYear(), TODAY.getMonth() + n, 1); return `${t.getFullYear()}년 ${t.getMonth() + 1}월`; }
+
+function ymShort(n) { const t = new Date(TODAY.getFullYear(), TODAY.getMonth() + n, 1); return `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}`; }
+
+function todayLabel() { const d = ['일', '월', '화', '수', '목', '금', '토'][TODAY.getDay()]; return `${TODAY.getMonth() + 1}월 ${TODAY.getDate()}일 ${d}요일`; }
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+/* ===== icons.js ===== */
+// Lucide 라인 아이콘(24x24, 2px stroke) 인라인 SVG. 이모지는 쓰지 않는다.
+
+const I = {
+  back: '<path d="m15 18-6-6 6-6"/>',
+  right: '<path d="m9 18 6-6-6-6"/>',
+  down: '<path d="m6 9 6 6 6-6"/>',
+  up: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  home: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  sliders: '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
+  tup: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  tdown: '<polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/>',
+  news: '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  warn: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  chat: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  list: '<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
+  percent: '<line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  db: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
+  bank: '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+  target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  pie: '<path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+  cal: '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>',
+  x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  wallet: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  activity: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  house: '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  undo: '<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>',
+  sparkles: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+};
+
+const ico = (n, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
+
+/* ===== engine.js ===== */
+// 계산 엔진 — 결정적. 화면의 모든 금액·기간은 여기서만 만든다(AI 없음).
+// 배분 규칙: 1년 이내 주식 0%, 3년 이내 주식 최대 35%(초과분은 채권).
+
+const ENGINE = {
+  weights(risk, months) {
+    const w = BASE[risk].slice();
+    if (months != null && months <= 12) return [60, 35, 5, 0];
+    if (months != null && months <= 36 && w[3] > 35) { w[2] += w[3] - 35; w[3] = 35; }
+    return w;
+  },
+  ruleNote(risk, months) {
+    if (months != null && months <= 12) return '1년 이내 목표라 주식은 넣지 않고 적금·예금 위주로 갑니다.';
+    if (months != null && months <= 36 && BASE[risk][3] > 35) return '3년 이내 목표라 주식은 35%까지만 두고, 초과분은 채권으로 돌립니다.';
+    return null;
+  },
+  project(saving, lump, n, w) {
+    saving = Math.max(0, Number(saving) || 0); lump = Math.max(0, Number(lump) || 0); n = Math.max(0, Math.floor(n) || 0); // 음수 방어
+    const wf = w.map(x => x / 100);
+    const lw = [0, wf[0] + wf[1], wf[2], wf[3]];
+    const rows = KEYS.map((key, k) => {
+      const d = saving * wf[k], L = lump * lw[k], r = RATES[key];
+      let principal, gross;
+      if (key === '적금') { principal = d * n + L; gross = d * n + d * (r / 12) * n * (n + 1) / 2 + L; }
+      else { const i = r / 12; principal = d * n + L; gross = (d ? d * (Math.pow(1 + i, n) - 1) / i : 0) + L * Math.pow(1 + i, n); }
+      const net = principal + (gross - principal) * (1 - TAX);
+      return { key, w: w[k], monthly: d, lump: L, principal, gross, net, gain: net - principal };
+    });
+    const principal = rows.reduce((s, r) => s + r.principal, 0), net = rows.reduce((s, r) => s + r.net, 0);
+    return { rows, principal, net, gain: net - principal };
+  },
+  monthsToGoal(goal, saving, lump, risk) {
+    for (let n = 1; n <= 600; n++) if (ENGINE.project(saving, lump, n, ENGINE.weights(risk, n)).net >= goal) return n;
+    return null;
+  },
+  requiredSaving(goal, n, lump, risk) {
+    const w = ENGINE.weights(risk, n);
+    const lumpNet = ENGINE.project(0, lump, n, w).net, unit = ENGINE.project(1, 0, n, w).net;
+    return Math.max(0, (goal - lumpNet) / unit);
+  },
+  loanPayment(P, rate = LOAN_RATE, years = LOAN_YEARS) { const i = rate / 12, n = years * 12; return P * i / (1 - Math.pow(1 + i, -n)); },
+  blend(w) { return w.reduce((s, x, k) => s + x / 100 * RATES[KEYS[k]], 0); },
+};
+
+/* ===== questions.js ===== */
+// 목적 설정 대화의 질문·선택지·확인 문구. 문구를 고치려면 여기만 본다.
+
+function qFor(id) {
+  const a = S.a;
+  switch (id) {
+    case 'goalType': return { id, text: '안녕하세요, ABBA 2.0이에요.\n먼저 무엇을 위해 돈을 모으는지 알려주세요.', type: 'chips', chips: [{ l: '집 사기', v: 'house' }, { l: '목돈 모으기', v: 'lump' }, { l: '사고 싶은 물건', v: 'item' }, { l: '아직 없어요, 그냥 재테크', v: 'none' }] };
+    case 'amount':
+      if (a.goalType === 'house') return { id, text: '목표 집값은 얼마인가요?\n집값의 ${Math.round(LTV * 100)}%는 대출로 보고(LTV 가정), 나머지 ${Math.round((1 - LTV) * 100)}%를 저축 목표로 잡을게요.', type: 'num', unit: '만 원', min: 1000, chips: [{ l: '2억', v: 20000 }, { l: '3억', v: 30000 }, { l: '5억', v: 50000 }, { l: '직접 입력', v: 'custom' }] };
+      if (a.goalType === 'item') return { id, text: '사고 싶은 물건은 얼마인가요?', type: 'num', unit: '만 원', min: 10, chips: [{ l: '300만', v: 300 }, { l: '500만', v: 500 }, { l: '1,000만', v: 1000 }, { l: '직접 입력', v: 'custom' }] };
+      return { id, text: '얼마를 모으고 싶으세요?', type: 'num', unit: '만 원', min: 10, chips: [{ l: '1,000만', v: 1000 }, { l: '3,000만', v: 3000 }, { l: '5,000만', v: 5000 }, { l: '1억', v: 10000 }, { l: '직접 입력', v: 'custom' }] };
+    case 'months': return { id, text: a.goalType === 'none' ? '얼마 동안 모을 생각이세요?' : '언제까지 모으고 싶으세요?', type: 'num', unit: '개월', min: 1, max: 600, chips: [{ l: '1년', v: 12 }, { l: '2년', v: 24 }, { l: '3년', v: 36 }, { l: '5년', v: 60 }, { l: '직접 입력', v: 'custom' }, { l: '아직 모르겠어요', v: 'unknown' }] };
+    case 'lump': return { id, text: '지금까지 모아둔 돈이 있나요?\n이 목표에 쓸 수 있는 금액만 알려주세요.', type: 'num', unit: '만 원', min: 0, chips: [{ l: '없어요', v: 0 }, { l: '500만', v: 500 }, { l: '1,000만', v: 1000 }, { l: '직접 입력', v: 'custom' }] };
+    case 'income': return { id, text: '한 달 수입은 얼마인가요?\n세후 실수령 기준이에요.', type: 'num', unit: '만 원', min: 10, chips: [{ l: '200만', v: 200 }, { l: '250만', v: 250 }, { l: '300만', v: 300 }, { l: '직접 입력', v: 'custom' }] };
+    case 'expense': return { id, text: '한 달 지출은 보통 얼마인가요?\n지출 대신 매달 저축할 금액을 바로 알려주셔도 돼요.', type: 'expense', unit: '만 원', min: 0 };
+    case 'saving': { const max = Math.max(0, a.income - a.expense); const c = x => Math.floor(max * x / M); return { id, text: `그럼 매달 최대 ${won(max)}을 저축할 수 있어요.\n이 중 얼마를 저축할까요?`, type: 'num', unit: '만 원', min: 1, chips: [{ l: `전부 ${won(max)}`, v: max / M }, { l: `${fmt(c(0.8))}만`, v: c(0.8) }, { l: `${fmt(c(0.6))}만`, v: c(0.6) }, { l: '직접 입력', v: 'custom' }] }; }
+    case 'risk': return { id, text: '마지막으로 투자 성향을 골라주세요.\n주식·채권 비율을 정하는 데 써요.', type: 'chips', chips: [{ l: '안정형', d: '원금 지키기가 우선', v: '안정형' }, { l: '중립형', d: '적당한 변동은 감수', v: '중립형' }, { l: '공격형', d: '수익 우선, 변동 감수', v: '공격형' }, { l: '잘 모르겠어요', d: '중립형으로 시작', v: 'unsure' }] };
+  }
+}
+
+function expenseChips(mode) { return mode === 'expense' ? [{ l: '100만', v: 100 }, { l: '150만', v: 150 }, { l: '200만', v: 200 }, { l: '직접 입력', v: 'custom' }] : [{ l: '50만', v: 50 }, { l: '80만', v: 80 }, { l: '100만', v: 100 }, { l: '직접 입력', v: 'custom' }]; }
+
+function ackFor(id, v) {
+  const a = S.a;
+  switch (id) {
+    case 'goalType': return { house: '집은 대출까지 같이 봐야 해요. 목표 집값 기준으로 자기자본부터 계산할게요.', lump: '좋아요. 금액과 기간만 정하면 바로 계획이 나와요.', item: '금액 기준으로 언제 살 수 있는지 계산해 드릴게요.', none: '괜찮아요. 저축 가능한 금액을 보고 맞는 목표를 제안해 드릴게요.' }[v];
+    case 'amount': return a.goalType === 'house' ? `${won(v)}이면 자기자본 ${Math.round((1 - LTV) * 100)}%인 ${won(v * (1 - LTV))}이 저축 목표예요. 나머지는 대출로 계산할게요.` : `${won(v)}을 목표로 잡을게요.`;
+    case 'months': return v == null ? '기간은 비워둘게요. 매달 저축액으로 언제 도달하는지 계산해 드릴게요.' : `${fmt(v)}개월이면 ${ymAdd(v - 1)}까지예요.`;
+    case 'lump': return v > 0 ? `모아둔 ${won(v)}은 예금·채권 쪽에 먼저 넣어 굴릴게요.` : '괜찮아요. 매달 저축액이 핵심이에요.';
+    case 'income': return `월 ${won(v)} 기준으로 볼게요.`;
+    case 'expense': return `수입에서 지출을 빼면 매달 ${won(a.income - v)}이 남아요.`;
+    case 'savingDirect': return `매달 ${won(v)} 저축으로 계획할게요. 수입의 ${Math.round(v / a.income * 100)}%예요.`;
+    case 'saving': return `매달 ${won(v)}으로 계획할게요.`;
+    case 'risk': {
+      const w = ENGINE.weights(a.risk, a.months);
+      const head = v === 'unsure' ? '그럼 중립형으로 시작할게요. 계획 화면에서 언제든 바꿀 수 있어요.\n' : '';
+      const rule = ENGINE.ruleNote(a.risk, a.months);
+      return head + `${a.risk}이면 주식 ${w[3]}%, 채권 ${w[2]}%, 나머지 ${w[0] + w[1]}%는 적금·예금으로 나눌게요.` + (rule ? '\n' + rule : '');
+    }
+  }
+}
+
+/* ===== state.js ===== */
+// 전역 상태와 목적 설정 진행도. 화면은 이 상태만 보고 그린다(서버 없음).
+
+const blank = () => ({ goalType: null, amount: null, months: null, monthsKnown: null, lump: null, income: null, expense: null, saving: null, risk: null, suggested: false });
+
+const S = {
+  a: blank(),
+  chat: { log: [], done: false, mode: 'expense', busy: false, pendingCustom: false },
+  planRisk: null,
+  brief: { time: '08:00', th: 3, alerts: { price: true, rate: true, news: true, ma: true } },
+  demo: false,
+};
+
+const ORDER = ['goalType', 'amount', 'months', 'lump', 'income', 'expense', 'saving', 'risk'];
+
+const GOAL_LABEL = { house: '집 사기', lump: '목돈 모으기', item: '사고 싶은 물건', none: '그냥 재테크' };
+
+function included(id) { const a = S.a; if (id === 'amount') return a.goalType && a.goalType !== 'none'; if (id === 'saving') return a.expense != null; return true; }
+
+function answered(id) { const a = S.a; if (id === 'months') return a.monthsKnown !== null; if (id === 'expense') return a.expense != null || a.saving != null; return a[id] != null; }
+
+function currentQ() { for (const id of ORDER) if (included(id) && !answered(id)) return id; return null; }
+
+function progress() { const ids = ORDER.filter(included); return { done: ids.filter(answered).length, total: ids.length }; }
+
+function startChat() { S.a = blank(); S.chat = { log: [], done: false, mode: 'expense', busy: false, pendingCustom: false }; S.planRisk = null; S.demo = false; go('chat'); }
+
+function fillExample() {
+  S.a = Object.assign(blank(), { goalType: 'lump', amount: 3000 * M, months: 24, monthsKnown: true, lump: 0, income: 250 * M, expense: 160 * M, saving: 90 * M, risk: '중립형' });
+  S.planRisk = '중립형'; S.demo = true;
+  S.chat = { log: [], done: true, mode: 'expense', busy: false, pendingCustom: false };
+  const pairs = [['goalType', '목돈 모으기'], ['amount', '3,000만 원'], ['months', '24개월'], ['lump', '없어요'], ['income', '250만 원'], ['expense', '160만 원'], ['saving', '90만 원'], ['risk', '중립형']];
+  const tmp = Object.assign({}, S.a);
+  pairs.forEach(([id, label]) => { S.chat.log.push({ who: 'ai', kind: 'q', qid: id, text: qFor(id).text }); S.chat.log.push({ who: 'me', kind: 'a', qid: id, text: label }); });
+  S.chat.log.push({ who: 'ai', kind: 'done', text: '필요한 정보는 다 모였어요. 추천 계획을 만들었어요.' });
+  go('plan');
+}
+
+/* ===== validate.js ===== */
+// 숫자 입력의 파싱·검증. 음수와 기호는 이 파일에서 전부 막는다.
+//
+// 3중 방어
+//   1) onNumKey        — 숫자가 아닌 글자키를 아예 못 누르게 한다(마이너스 포함)
+//   2) parseNum        — 붙여넣기·드롭·IME로 들어온 값에서 숫자만 남기고, 무엇을 걸렀는지 알려준다
+//   3) validate        — 0 이하·범위 밖 값을 거부하고 이유를 화면에 띄운다
+// 엔진(engine.js)에도 마지막 방어가 있어, 어떤 경로로도 음수가 계산에 들어가지 않는다.
+
+const MINUS = /[-−–—+]/;              // 하이픈·유니코드 마이너스·전각 부호·플러스
+const NOT_DIGIT_OR_COMMA = /[^\d,]/;
+
+// 키보드에서 숫자가 아닌 글자키를 차단. 조합키·이동키·삭제키는 통과.
+function onNumKey(e) {
+  if (e.key === 'Enter') { e.preventDefault(); submitInput(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key.length !== 1) return;               // Backspace, Arrow, Tab …
+  if (/[0-9]/.test(e.key)) return;
+  e.preventDefault();
+  setHint(MINUS.test(e.key) ? 'negative' : 'char');
+  live();
+}
+
+// 붙여넣기·드롭은 막지 않고 들여보낸 뒤 parseNum이 정리한다(모바일 IME 호환).
+function onNumBeforeInput(e) {
+  if (typeof e.data === 'string' && NOT_DIGIT_OR_COMMA.test(e.data)) setHint(MINUS.test(e.data) ? 'negative' : 'char');
+}
+
+let hint = null;
+function setHint(kind) { hint = kind; }
+function takeHint() { const h = hint; hint = null; return h; }
+
+// 입력창의 값에서 숫자만 남기고 콤마를 다시 붙인다. 캐럿 위치는 앞쪽 숫자 개수로 복원.
+// 반환: { n, rejected } — rejected는 'negative' | 'char' | null
+function parseNum(el) {
+  const raw = el.value, pos = el.selectionStart ?? raw.length;
+  const digitsBefore = raw.slice(0, pos).replace(/\D/g, '').length;
+  const digits = raw.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, LIMITS.digits);
+  const out = digits ? fmt(Number(digits)) : '';
+  let rejected = takeHint();
+  if (!rejected && NOT_DIGIT_OR_COMMA.test(raw)) rejected = MINUS.test(raw) ? 'negative' : 'char';
+  if (out !== raw) {
+    el.value = out;
+    let c = 0, i = 0;
+    while (i < out.length && c < digitsBefore) { if (/\d/.test(out[i])) c++; i++; }
+    try { el.setSelectionRange(i, i); } catch (e) { }
+  }
+  return { n: digits ? Number(digits) : null, rejected };
+}
+
+const REJECT_MSG = { negative: '음수는 입력할 수 없어요', char: '숫자만 입력할 수 있어요' };
+const ZERO_OK = ['lump', 'expense'];   // 0을 허용하는 질문(모아둔 돈 없음, 지출 0)
+
+function validate(q, n, rejected) {
+  const a = S.a;
+  if (rejected && n == null) return { ok: false, msg: REJECT_MSG[rejected] };
+  if (n == null) return { ok: false, msg: q.unit === '개월' ? '숫자만 입력' : '만 원 단위로 입력' };
+
+  if (q.unit === '개월') {
+    if (n < LIMITS.months.min) return { ok: false, msg: `${LIMITS.months.min}개월 이상이어야 해요` };
+    if (n > LIMITS.months.max) return { ok: false, msg: `${LIMITS.months.max}개월(50년) 이하로 입력해 주세요` };
+    return { ok: true, msg: `${fmt(n)}개월 = ${ymAdd(n - 1)}까지`, warn: REJECT_MSG[rejected] };
+  }
+
+  const v = n * M;
+  if (v <= 0 && !ZERO_OK.includes(q.id)) return { ok: false, msg: '0보다 큰 금액을 입력해 주세요' };
+  if (v > LIMITS.money.max) return { ok: false, msg: `${won(LIMITS.money.max)} 이하로 입력해 주세요` };
+
+  if (q.id === 'amount' && v < q.min * M) return { ok: false, msg: `${won(q.min * M)} 이상 입력해 주세요` };
+  if (q.id === 'lump' && a.amount != null) {
+    const t = a.goalType === 'house' ? a.amount * (1 - LTV) : a.amount;
+    if (v >= t) return { ok: false, msg: `모아둔 돈이 저축 목표(${won(t)})보다 많아요. 이미 달성한 목표예요` };
+  }
+  if (q.id === 'income') {
+    if (v < LIMITS.income.min) return { ok: false, msg: `${won(LIMITS.income.min)} 이상 입력해 주세요` };
+    if (v > LIMITS.income.max) return { ok: false, msg: `${won(LIMITS.income.max)} 이하로 입력해 주세요` };
+  }
+  if (q.id === 'expense') {
+    if (S.chat.mode === 'expense') {
+      if (v >= a.income) return { ok: false, msg: `지출이 수입(${won(a.income)})보다 크거나 같아요` };
+      return { ok: true, msg: `= ${won(v)} · 남는 돈 ${won(a.income - v)}`, warn: REJECT_MSG[rejected] };
+    }
+    if (v <= 0) return { ok: false, msg: '1만 원 이상 입력해 주세요' };
+    if (v > a.income) return { ok: false, msg: `저축액이 수입(${won(a.income)})보다 커요` };
+    return { ok: true, msg: `= ${won(v)} · 수입의 ${Math.round(v / a.income * 100)}%`, warn: REJECT_MSG[rejected] };
+  }
+  if (q.id === 'saving') {
+    const max = Math.max(0, a.income - a.expense);
+    if (v > max) return { ok: false, msg: `지출을 빼면 ${won(max)}까지 가능해요` };
+    if (v <= 0) return { ok: false, msg: '1만 원 이상 입력해 주세요' };
+  }
+  return { ok: true, msg: `= ${won(v)}`, warn: REJECT_MSG[rejected] };
+}
+
+/* ===== ui.js ===== */
+// 화면 공통 조각 — 상단 띠·헤더·탭바·화면 목록 시트·토스트.
+
+function strip() { return `<div class="strip"><div><b>ABBA 2.0</b> 시안 v1.3 · 팀 공유판 · 예시 데이터</div><button onclick="openSheet()">화면 목록</button></div>`; }
+
+function topBar(title, opt = {}) {
+  const back = opt.back === false ? '<span style="width:8px"></span>' : `<button class="ib" aria-label="뒤로" onclick="${opt.backTo ? `go('${opt.backTo}')` : 'history.back()'}">${ico('back')}</button>`;
+  return `<div class="top">${back}<h2>${title}</h2>${opt.right || ''}</div>${opt.bar != null ? `<div class="bar"><i style="width:${opt.bar}%"></i></div>` : ''}`;
+}
+
+function tabbar(cur) {
+  const t = [['plan', 'home', '계획'], ['brief', 'bell', '브리핑'], ['settings', 'sliders', '설정']];
+  const on = cur === 'data' ? 'settings' : cur;
+  return `<nav class="tabbar">${t.map(([r, i, l]) => `<a href="#/${r}" class="${on === r ? 'on' : ''}">${ico(i, 22)}${l}</a>`).join('')}</nav>`;
+}
+
+function openSheet() {
+  $('#layer').innerHTML = `<div class="ov" onclick="if(event.target===this)closeSheet()"><div class="sheet"><h4>화면 목록 <button class="ib" style="border:0;background:transparent" aria-label="닫기" onclick="closeSheet()">${ico('x', 20)}</button></h4>
+    <a href="#/" onclick="closeSheet()">시작<span>서비스 소개</span></a>
+    <a href="#/chat" onclick="closeSheet();if(!S.chat.log.length)startChat()">1 목적 설정 대화<span>AI가 묻고 답하는 흐름</span></a>
+    <a href="#/plan" onclick="closeSheet();if(!planReady())fillExample()">2 추천 계획<span>${planReady() ? '내 답변 기준' : '예시 값으로 열기'}</span></a>
+    <a href="#/brief" onclick="closeSheet()">4 오늘의 브리핑<span>하루 한 번 알림 예시</span></a>
+    <a href="#/data" onclick="closeSheet()">3 AI가 학습하는 금융 정보<span>데이터 출처·갱신 주기</span></a>
+    <a href="#/settings" onclick="closeSheet()">알림 설정<span>시간·항목·연결</span></a>
+    <h4 style="margin-top:14px">팀 문서 <span class="muted" style="font-weight:400;font-size:12px">새 창으로 열림</span></h4>
+    ${DOCS.map(d => `<a class="doc" href="${d.url}" target="_blank" rel="noopener">${esc(d.title)}<span>${esc(d.desc)}</span></a>`).join('')}
+    <div class="muted" style="padding:10px 4px 0">파일 원본: 프로젝트 폴더 <b>09_ABBA 2.0</b></div>
+  </div></div>`;
+}
+
+function closeSheet() { $('#layer').innerHTML = ''; }
+
+let toastT = null;
+
+function toast(msg) { let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; document.body.appendChild(t); } t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 1600); }
+
+/* ===== screens/start.js ===== */
+// 시작 화면 — 서비스 소개와 진입 CTA.
+
+function vStart() {
+  return `<div class="main fade">
+  <div class="hero">
+    <div class="brand">ABBA 2.0</div>
+    <h1>묻기 전에 먼저 알려주는<br>AI 재테크 코치</h1>
+    <p>목표를 같이 정하고, 적금·예금·채권·주식을 어떻게 나눌지 계산해요. 그다음부터는 매일 아침 AI가 먼저 점검 결과를 보내드려요.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><div><b>목적 설정</b><span>기간·목표·수입·지출을 대화로 물어봐요. 기간이나 목표를 아직 몰라도 괜찮아요.</span></div></div>
+    <div class="step"><div class="n">2</div><div><b>방법 추천</b><span>성향과 기간에 맞춰 적금·예금·채권·주식 비율과 예상 수익을 계산해요. 집이 목표면 대출까지 봐요.</span></div></div>
+    <div class="step"><div class="n">3</div><div><b>매일 브리핑</b><span>보유 종목 등락, 더 높은 금리 상품, 종목 뉴스 호재·악재, 이동평균선 전망을 하루 한 번 알려드려요.</span></div></div>
+  </div>
+  <div class="note">${ico('info', 16)}<div>시안입니다. 계산은 화면 안의 규칙으로 실제로 돌고, AI 문장은 템플릿, 브리핑의 시세·뉴스·상품은 예시 데이터예요. 로그인·저장·실데이터·Claude 문장은 9/6까지 본 구현에서 붙습니다. 팀 문서는 상단 "화면 목록"에 있어요.</div></div>
+  </div>
+  <div class="cta"><button class="btn" onclick="startChat()">목표 정하기 시작</button><button class="sub2" onclick="fillExample()">예시 값으로 계획 화면 바로 보기</button></div>`;
+}
+
+/* ===== screens/chat.js ===== */
+// 목적 설정 대화 — 질문 흐름, 입력 처리, 답변 저장·되돌리기.
+
+function vChat() {
+  const p = progress();
+  const c = S.chat;
+  if (!c.log.length) { const q = qFor(currentQ()); c.log.push({ who: 'ai', kind: 'q', qid: q.id, text: q.text }); }
+  const log = c.log.map(m => m.who === 'ai'
+    ? `<div class="msg ai"><div class="av">AI</div><div class="bub">${esc(m.text)}</div></div>`
+    : `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`).join('');
+  const typing = c.busy ? `<div class="msg ai"><div class="av">AI</div><div class="bub typing"><i></i><i></i><i></i></div></div>` : '';
+  return `${topBar('목적 설정', { backTo: 'start', right: `<span class="prog">${p.done}/${p.total}</span>`, bar: Math.round(p.done / p.total * 100) })}
+  <div class="main" style="padding-bottom:230px"><div class="log" id="log">${log}${typing}</div></div>
+  ${composer()}`;
+}
+
+function composer() {
+  const c = S.chat;
+  if (c.busy) return `<div class="composer" id="composer"><div class="muted" style="text-align:center;padding:8px 0">답변을 정리하고 있어요</div></div>`;
+  if (c.done) return `<div class="composer" id="composer"><button class="btn" onclick="go('plan')">추천 계획 보기 ${ico('right', 18)}</button><div style="display:flex;justify-content:center;margin-top:8px"><button class="undo" onclick="undo()">${ico('undo', 14)} 마지막 답변 수정</button></div></div>`;
+  const id = currentQ(); if (!id) return '';
+  const q = qFor(id);
+  const canUndo = c.log.some(m => m.kind === 'a');
+  const undoBtn = canUndo ? `<button class="undo" onclick="undo()">${ico('undo', 14)} 이전 답변 수정</button>` : '';
+  let chips = q.chips || [], seg = '';
+  if (q.type === 'expense') {
+    seg = `<div class="seg"><button class="${c.mode === 'expense' ? 'on' : ''}" onclick="setMode('expense')">월 지출로 답하기</button><button class="${c.mode === 'saving' ? 'on' : ''}" onclick="setMode('saving')">저축액으로 답하기</button></div>`;
+    chips = expenseChips(c.mode);
+  }
+  const chipHtml = `<div class="chips">${chips.map(ch => `<button class="chip ${ch.d ? 'wide' : ''} ${ch.v === 'custom' && c.pendingCustom ? 'sel' : ''}" onclick="chip(${typeof ch.v === 'string' ? `'${ch.v}'` : ch.v})">${esc(ch.l)}${ch.d ? `<small>${esc(ch.d)}</small>` : ''}</button>`).join('')}</div>`;
+  const input = q.type === 'chips' ? '' : `<div class="irow"><div class="field"><input id="num" inputmode="numeric" autocomplete="off" placeholder="${q.unit === '개월' ? '개월 수' : '금액'}" aria-label="${q.unit === '개월' ? '개월 수' : '금액(만 원)'}" oninput="live()" onkeydown="onNumKey(event)" onbeforeinput="onNumBeforeInput(event)" onfocus="onFocusNum()"><span>${q.unit}</span></div><button class="send" id="send" aria-label="보내기" onclick="submitInput()" disabled>${ico('up', 22)}</button></div><div class="help" id="help"><span id="helpL">${q.unit === '개월' ? '숫자만 입력' : '만 원 단위로 입력'}</span><span>${undoBtn}</span></div>`;
+  return `<div class="composer" id="composer">${seg}${chipHtml}${input}${q.type === 'chips' ? `<div class="help"><span></span><span>${undoBtn}</span></div>` : ''}</div>`;
+}
+
+function afterChat() { const l = $('#log'); if (l) window.scrollTo(0, document.body.scrollHeight); }
+
+function setMode(m) { S.chat.mode = m; S.chat.pendingCustom = false; render(); }
+
+function onFocusNum() { setTimeout(() => { const el = $('#num'); if (el) el.scrollIntoView({ block: 'nearest' }); }, 60); }
+
+// 입력할 때마다 도움말과 보내기 버튼 상태를 갱신한다(전체 render 대신).
+function live() {
+  const el = $('#num'); if (!el) return;
+  const q = qFor(currentQ()); const { n, rejected } = parseNum(el); const r = validate(q, n, rejected);
+  const help = $('#help'), hl = $('#helpL'), send = $('#send');
+  if (hl) hl.textContent = r.ok && r.warn ? `${r.warn} · ${r.msg}` : r.msg;
+  if (help) help.classList.toggle('err', !r.ok ? (n != null || !!rejected) : !!r.warn);
+  if (send) send.disabled = !r.ok;
+}
+
+function submitInput() {
+  const el = $('#num'); if (!el) return;
+  const q = qFor(currentQ()); const { n, rejected } = parseNum(el); const r = validate(q, n, rejected);
+  if (!r.ok) { live(); return; }
+  answer(q, n);
+}
+
+function chip(v) {
+  const q = qFor(currentQ()); if (!q) return;
+  if (v === 'custom') { S.chat.pendingCustom = true; const el = $('#num'); if (el) { el.focus(); } document.querySelectorAll('.chip').forEach(b => b.classList.toggle('sel', b.textContent.trim() === '직접 입력')); return; }
+  answer(q, v);
+}
+
+function answer(q, v) {
+  const a = S.a, c = S.chat; let label, ackId = q.id, store = v;
+  switch (q.id) {
+    case 'goalType': a.goalType = v; label = GOAL_LABEL[v]; break;
+    case 'amount': a.amount = v * M; store = a.amount; label = won(a.amount); break;
+    case 'months': if (v === 'unknown') { a.months = null; a.monthsKnown = false; store = null; label = '아직 모르겠어요'; } else { a.months = v; a.monthsKnown = true; label = `${fmt(v)}개월`; } break;
+    case 'lump': a.lump = v * M; store = a.lump; label = v === 0 ? '없어요' : won(a.lump); break;
+    case 'income': a.income = v * M; store = a.income; label = won(a.income); break;
+    case 'expense': if (c.mode === 'expense') { a.expense = v * M; store = a.expense; label = `지출 ${won(a.expense)}`; } else { a.saving = v * M; store = a.saving; label = `저축 ${won(a.saving)}`; ackId = 'savingDirect'; } break;
+    case 'saving': a.saving = v * M; store = a.saving; label = won(a.saving); break;
+    case 'risk': a.risk = v === 'unsure' ? '중립형' : v; S.planRisk = a.risk; label = v === 'unsure' ? '잘 모르겠어요' : v; break;
+  }
+  c.pendingCustom = false;
+  c.log.push({ who: 'me', kind: 'a', qid: q.id, text: label });
+  c.busy = true; render();
+  setTimeout(() => {
+    c.log.push({ who: 'ai', kind: 'ack', qid: q.id, text: ackFor(ackId, store) });
+    const next = currentQ();
+    if (next) { const nq = qFor(next); c.log.push({ who: 'ai', kind: 'q', qid: nq.id, text: nq.text }); }
+    else { c.done = true; c.log.push({ who: 'ai', kind: 'done', text: '필요한 정보는 다 모였어요. 추천 계획을 만들었어요.' }); }
+    c.busy = false; render();
+  }, 380);
+}
+
+function undo() {
+  const c = S.chat, a = S.a;
+  let idx = -1; for (let i = c.log.length - 1; i >= 0; i--) if (c.log[i].kind === 'a') { idx = i; break; }
+  if (idx < 0) return;
+  const qid = c.log[idx].qid;
+  c.log.splice(idx);
+  const from = ORDER.indexOf(qid);
+  ORDER.slice(from).forEach(id => { if (id === 'months') { a.months = null; a.monthsKnown = null; } else a[id] = null; });
+  if (qid === 'expense') a.saving = null;
+  c.done = false; c.pendingCustom = false; S.planRisk = null; render();
+}
+
+/* ===== screens/plan.js ===== */
+// 추천 계획 — 배분·예상 수익·부족분·조정안·대출 카드.
+
+function planCalc(risk) {
+  const a = S.a;
+  const house = a.goalType === 'house';
+  const target = house ? a.amount * 0.3 : a.amount;
+  let months = a.months, computed = false, unreachable = false;
+  if (months == null) { months = ENGINE.monthsToGoal(target, a.saving, a.lump, risk); computed = true; if (months == null) { unreachable = true; months = 600; } }
+  const w = ENGINE.weights(risk, months), p = ENGINE.project(a.saving, a.lump, months, w);
+  const short = target - p.net;
+  const status = unreachable ? 'unreach' : short <= 0 ? 'ok' : short <= target * 0.1 ? 'near' : 'redesign';
+  const r = { house, target, months, computed, unreachable, w, p, short, status, risk };
+  if (house) {
+    const price = a.amount, loan = Math.max(0, price - p.net), cap = price * LTV, over = Math.max(0, loan - cap);
+    const pmt = ENGINE.loanPayment(Math.min(loan, cap)), ratio = a.income ? pmt / a.income : 0;
+    r.loan = { price, loan, cap, over, pmt, ratio, level: ratio <= 0.3 ? 'ok' : ratio <= 0.4 ? 'warn' : 'bad' };
+  }
+  return r;
+}
+
+function suggestGoal(n) { const p = ENGINE.project(S.a.saving, S.a.lump, n, ENGINE.weights(S.planRisk || S.a.risk, n)); return Math.floor(p.net / (10 * M)) * 10 * M; }
+
+function pickSuggest(n) { S.a.months = n; S.a.amount = suggestGoal(n); S.a.suggested = true; render(); }
+
+function setRisk(r) { S.planRisk = r; if (S.a.goalType === 'none' && S.a.suggested) S.a.amount = suggestGoal(S.a.months); render(); }
+
+function applyMonths(n) { S.a.months = n; S.a.monthsKnown = true; toast(`기간을 ${n}개월로 바꿨어요`); render(); }
+
+function applySaving(v) { S.a.saving = v; toast(`월 저축액을 ${won(v)}으로 바꿨어요`); render(); }
+
+function applyRisk(r) { S.planRisk = r; toast(`${r}으로 바꿨어요`); render(); }
+
+const STATUS = { ok: ['ok', '계획대로 가능'], near: ['warn', '조금 부족'], redesign: ['bad', '재설계 필요'], unreach: ['bad', '도달 어려움'] };
+
+function vPlan() {
+  const a = S.a; const risk = S.planRisk || a.risk;
+  let suggestCard = '';
+  if (a.goalType === 'none') {
+    if (a.amount == null) { if (a.months == null) a.months = 24; a.amount = suggestGoal(a.months); a.suggested = true; }
+    const opts = a.monthsKnown ? [a.months] : [12, 24, 36];
+    suggestCard = `<div class="card"><h3>${ico('target', 18)}제안한 목표</h3>
+      <div class="sub">매달 ${won(a.saving)} 저축${a.lump ? ` + 모아둔 ${won(a.lump)}` : ''} 기준으로 ${risk} 배분을 하면 이만큼 모여요. 이 금액을 목표로 잡아 계획을 세웠어요.</div>
+      <div class="opts">${opts.map(n => `<button class="opt ${a.months === n ? 'sel' : ''}" onclick="pickSuggest(${n})"><b>${won(suggestGoal(n))}</b><span>${n % 12 === 0 ? `${n / 12}년` : `${n}개월`} 뒤</span></button>`).join('')}</div>
+      ${a.monthsKnown ? '' : '<div class="muted" style="margin-top:8px">기간을 정하지 않으셔서 1·2·3년 세 가지로 제안했어요.</div>'}</div>`;
+  }
+  const c = planCalc(risk);
+  const [pc, pl] = STATUS[c.status];
+  const goalName = a.goalType === 'house' ? `집 사기 · 집값 ${won(a.amount)}` : a.goalType === 'none' ? `제안 목표 ${won(a.amount)}` : `${GOAL_LABEL[a.goalType]} ${won(a.amount)}`;
+  const monthsLabel = c.unreachable ? '50년 내 도달 어려움' : c.computed ? `${c.months}개월 (계산)` : `${c.months}개월`;
+  const reach = c.unreachable ? '' : `${ymAdd(c.months - 1)} 도달`;
+  const ratio = Math.min(1, c.p.net / c.target);
+
+  // 요약 카드
+  const summary = `<div class="card">
+    <div class="hr"><div class="sub" style="font-weight:600;color:var(--t1)">${goalName}</div><span class="pill ${pc}">${pl}</span></div>
+    <div class="muted">${a.goalType === 'house' ? `저축 목표(자기자본 30%) ${won(c.target)} · ` : ''}${monthsLabel} · 월 ${won(a.saving)}${a.lump ? ` · 모아둔 ${won(a.lump)}` : ''}</div>
+    <div class="big" style="margin-top:14px">${won(c.p.net)}</div>
+    <div class="sub">${c.unreachable ? '50년 기준 예상 총액' : `${c.months}개월 뒤 예상 총액`} · 원금 ${won(c.p.principal)} + 수익 ${won(c.p.gain)}<span class="muted">(세후)</span></div>
+    <div class="progbar"><i style="width:${Math.round(ratio * 100)}%"></i></div>
+    <div class="help" style="margin-top:0"><span>목표 ${won(c.target)}${c.short > 0 ? ` · ${won(c.short)} 부족` : ` · ${won(-c.short)} 여유`}</span><span>${reach}</span></div>
+  </div>`;
+
+  // 성향 선택
+  const seg = `<div class="segp">${['안정형', '중립형', '공격형'].map(r => `<button class="${risk === r ? 'on' : ''}" onclick="setRisk('${r}')">${r}</button>`).join('')}</div>`;
+
+  // 배분 카드
+  const cls = ['c1', 'c2', 'c3', 'c4'];
+  const rule = ENGINE.ruleNote(risk, c.unreachable ? null : c.months);
+  const alloc = `<div class="card"><h3>${ico('pie', 18)}추천 배분 <span class="muted" style="font-weight:500">${risk} · 가정 수익률 연 ${(ENGINE.blend(c.w) * 100).toFixed(1)}%</span></h3>
+    <div class="stack">${c.w.map((x, k) => x ? `<i class="${cls[k]}" style="width:${x}%"></i>` : '').join('')}</div>
+    ${c.p.rows.map((r, k) => `<div class="arow"><span class="dot ${cls[k]}"></span><div class="r1">${r.key} <span class="muted">${r.w}%</span></div><div class="amt">${r.w ? `월 ${won(r.monthly, true)}` : '-'}</div>
+      <div class="r2"><span>${r.key === '적금' ? '단리' : '월복리'} 연 ${(RATES[r.key] * 100).toFixed(1)}%${r.lump ? ` · 모아둔 돈 ${won(r.lump, true)}` : ''}</span><span>예상 수익 ${r.w || r.lump ? won(r.gain, true) : '-'}</span></div></div>`).join('')}
+    ${rule ? `<div class="note">${ico('info', 16)}<div>${rule}</div></div>` : ''}
+    <details><summary>${ico('down', 14)} 왜 이 비율인가요?</summary><div class="body">
+      성향별 기본 비율(적금·예금·채권·주식)은 안정형 50·30·15·5, 중립형 35·15·20·30, 공격형 20·10·15·55입니다. 기간이 1년 이내면 60·35·5·0으로 바꾸고, 3년 이내면 주식을 35%까지만 둡니다. 모아둔 돈은 적금 대신 예금·채권·주식에 같은 비율로 나눕니다. 수익은 이자·수익에 15.4% 세금을 뺀 값이고, 실제 상품 수익률은 다를 수 있어요.<br><br>
+      상품 유형 예시: 적금은 은행 정기적금 12개월 자동이체, 예금은 파킹통장·정기예금(비상금 겸용), 채권은 국내 채권 ETF 적립 매수, 주식은 국내 지수 ETF 적립 매수.
+      ${c.w[3] > 0 && c.months < 36 ? '<br><br>주식 비중이 있고 기간이 3년 미만이면 목표일에 손실 상태일 수 있어요. 목표일 6개월 전부터는 주식 비중을 줄이는 걸 권해요.' : ''}
+    </div></details>
+  </div>`;
+
+  // 부족 시 조정안 / 여유 시 안내
+  let adjust = '';
+  if (c.status !== 'ok' && !c.computed) {
+    const n2 = ENGINE.monthsToGoal(c.target, a.saving, a.lump, risk);
+    const req = ENGINE.requiredSaving(c.target, c.months, a.lump, risk); const reqR = Math.ceil(req / M) * M;
+    const maxSave = a.expense != null ? a.income - a.expense : a.income;
+    const next = risk === '안정형' ? '중립형' : risk === '중립형' ? '공격형' : null;
+    let riskAlt = '';
+    if (next && c.months > 12) {
+      const pn = ENGINE.project(a.saving, a.lump, c.months, ENGINE.weights(next, c.months));
+      const covers = pn.net >= c.target;
+      riskAlt = `<div class="alt ${covers ? '' : 'off'}"><div><b>${next}으로 바꾸기</b><span>예상 총액 ${won(pn.net)} (+${won(pn.net - c.p.net)})${covers ? '' : ' · 성향만 바꿔서는 부족분을 못 메워요'}</span></div>${covers ? `<button class="btn sm ghost" onclick="applyRisk('${next}')">적용</button>` : ''}</div>`;
+    }
+    adjust = `<div class="card"><h3>${ico('sliders', 18)}부족분 ${won(c.short)}을 메우려면</h3>
+      ${n2 ? `<div class="alt rec"><div><b><span class="rectag">추천</span>기간을 ${n2}개월로 늘리기</b><span>${ymAdd(n2 - 1)} 도달 · 월 저축액 그대로</span></div><button class="btn sm" onclick="applyMonths(${n2})">적용</button></div>` : `<div class="alt off"><div><b>기간 늘리기</b><span>월 저축액으로는 50년 안에 도달하기 어려워요</span></div></div>`}
+      <div class="alt ${reqR > maxSave ? 'off' : ''}"><div><b>월 저축을 ${won(reqR)}으로 올리기</b><span>지금보다 +${won(reqR - a.saving)}${reqR > maxSave ? ` · 지출을 빼면 ${won(maxSave)}까지만 가능해요` : ''}</span></div>${reqR > maxSave ? '' : `<button class="btn sm ghost" onclick="applySaving(${reqR})">적용</button>`}</div>
+      ${riskAlt}
+    </div>`;
+  } else if (c.status === 'ok' && !c.computed) {
+    const n3 = ENGINE.monthsToGoal(c.target, a.saving, a.lump, risk);
+    adjust = `<div class="card"><h3>${ico('check', 18)}계획대로 가면 목표를 넘겨요</h3><div class="sub">${won(-c.short)} 여유가 있어요.${n3 && n3 < c.months ? ` 기간을 ${n3}개월(${ymAdd(n3 - 1)})로 줄여도 도달할 수 있어요.` : ''}</div>${n3 && n3 < c.months ? `<div class="alt"><div><b>기간을 ${n3}개월로 줄이기</b><span>월 저축액 그대로</span></div><button class="btn sm ghost" onclick="applyMonths(${n3})">적용</button></div>` : ''}</div>`;
+  } else if (c.computed && !c.unreachable) {
+    adjust = `<div class="card"><h3>${ico('cal', 18)}기간을 계산했어요</h3><div class="sub">매달 ${won(a.saving)}씩 ${risk} 배분으로 모으면 ${c.months}개월 뒤인 ${ymAdd(c.months - 1)}에 ${won(c.target)}에 도달해요.</div></div>`;
+  } else if (c.unreachable) {
+    const req5 = Math.ceil(ENGINE.requiredSaving(c.target, 60, a.lump, risk) / M) * M;
+    adjust = `<div class="card"><h3>${ico('warn', 18)}지금 저축액으로는 어려워요</h3><div class="sub">매달 ${won(a.saving)}으로는 50년 안에 ${won(c.target)}에 도달하기 어려워요. 5년 안에 도달하려면 월 ${won(req5)}이 필요해요.</div></div>`;
+  }
+
+  // 대출 카드 (집 사기)
+  let loan = '';
+  if (c.house) {
+    const L = c.loan; const lv = { ok: '여유', warn: '주의', bad: '기준 초과' }[L.level];
+    loan = `<div class="card"><h3>${ico('house', 18)}대출까지 같이 보면</h3>
+      <div class="row first"><span class="k">목표 집값</span><span class="v">${won(L.price)}</span></div>
+      <div class="row"><span class="k">${c.unreachable ? '50년 뒤' : `${c.months}개월 뒤`} 예상 자기자본</span><span class="v">${won(c.p.net)}</span></div>
+      <div class="row"><span class="k">필요 대출액</span><span class="v">${won(L.loan)}</span></div>
+      <div class="row"><span class="k">LTV 70% 상한 <span class="tagx need">가정</span></span><span class="v">${won(L.cap)}${L.over ? `<div class="muted" style="color:var(--bad)">상한 초과 ${won(L.over)}</div>` : ''}</span></div>
+      <div class="row"><span class="k">월 상환액 <span class="muted">연 4.0% · 30년 · 원리금균등</span></span><span class="v">${won(L.pmt, true)}</span></div>
+      <div class="row"><span class="k">수입 대비 상환 비율</span><span class="v">${Math.round(L.ratio * 100)}% <span class="pill ${L.level}">${lv}</span></span></div>
+      <div class="note">${ico('info', 16)}<div>LTV·DSR(40% 기준)·금리는 지역과 규제, 소득에 따라 달라요. 실제 한도는 은행 상담으로 확인해야 해요. ${L.over ? `상한을 넘는 ${won(L.over)}은 자기자본을 더 모아야 해요.` : '수입 대비 30% 이하면 여유, 40%를 넘으면 대출이 어려울 수 있어요.'}</div></div>
+    </div>`;
+  }
+
+  const assume = `<div class="card"><details open><summary>${ico('down', 14)} 계산 가정 보기</summary><div class="body">
+    <table><tr><th>자산</th><th>연 수익률(세전)</th><th>방식</th></tr>
+    <tr><td>적금</td><td>3.5%</td><td>단리</td></tr><tr><td>예금</td><td>3.2%</td><td>월복리</td></tr><tr><td>채권</td><td>4.0%</td><td>월복리</td></tr><tr><td>주식</td><td>7.5%</td><td>월복리</td></tr></table>
+    <div style="margin-top:8px">2026년 8월 기준 가정입니다. 한국은행 기준금리 연 3.00%(2026-08-27), 은행권 12개월 정기예금 약 4% 수준을 참고해 적금 3.5%·예금 3.2%로 보수적으로 잡았고, 주식 7.5%는 코스피 배당 포함 장기 연평균(2005~2024, 약 7.5%)입니다. 채권 4.0%는 국내 채권 ETF 기대치 <span class="tagx need">확인 필요</span>. 세금은 15.4%를 일괄 적용했고(국내 주식형 ETF 비과세 등 미반영), 본 구현에서는 금감원 금융상품 공시 API 값으로 대체합니다.</div>
+  </div></details></div>`;
+
+  return `${topBar('추천 계획', { backTo: 'chat', right: `<button class="ib" aria-label="답변 수정" onclick="go('chat')">${ico('pencil', 20)}</button>` })}
+  <div class="main fade" style="padding-bottom:150px">${suggestCard}${summary}${seg}${alloc}${adjust}${loan}${assume}</div>
+  <div class="cta tabbed"><button class="btn" onclick="go('brief')">${ico('bell', 18)} 매일 브리핑 받기</button></div>${tabbar('plan')}`;
+}
+
+/* ===== screens/brief.js ===== */
+// 오늘의 브리핑 — 계획 점검·등락·금리 상품·뉴스·지표·할 일.
+// 시세·뉴스·상품은 예시 데이터다. 실데이터는 본 구현의 배치가 채운다.
+
+function briefPlan() {
+  if (!planReady()) { const a = Object.assign(blank(), { goalType: 'lump', amount: 3000 * M, months: 24, monthsKnown: true, lump: 0, income: 250 * M, expense: 160 * M, saving: 90 * M, risk: '중립형' }); const w = ENGINE.weights('중립형', 24); return { a, w, p: ENGINE.project(a.saving, a.lump, 24, w), months: 24, sample: true, target: a.amount }; }
+  const c = planCalc(S.planRisk || S.a.risk); return { a: S.a, w: c.w, p: c.p, months: c.months, sample: false, target: c.target };
+}
+
+const SERIES = (() => {
+  const up = [], dn = [];
+  for (let i = 0; i < 45; i++) {
+    const wob = 0.9 * Math.sin(i * 0.8) + 0.5 * Math.sin(i * 2.3);
+    up.push(i < 38 ? 104 - i * 0.2 + wob : 96.4 + (i - 38) * 1.8 + wob);   // 완만한 하락 뒤 최근 7일 반등 → 골든크로스 4일째
+    dn.push(i < 38 ? 100 + i * 0.2 + wob : 107.6 - (i - 38) * 1.8 + wob);  // 완만한 상승 뒤 최근 7일 하락 → 데드크로스 4일째
+  }
+  return { up, dn };
+})();
+
+function ma(arr, n) { return arr.map((_, i) => i < n - 1 ? null : arr.slice(i - n + 1, i + 1).reduce((s, x) => s + x, 0) / n); }
+
+function spark(arr) {
+  const m5 = ma(arr, 5), m20 = ma(arr, 20); const from = 20; const xs = arr.slice(from), a5 = m5.slice(from), a20 = m20.slice(from);
+  const all = xs.concat(a5, a20).filter(x => x != null); const lo = Math.min(...all) - 0.5, hi = Math.max(...all) + 0.5;
+  const W = 360, H = 100, X = i => (i / (xs.length - 1)) * (W - 4) + 2, Y = v => H - 4 - (v - lo) / (hi - lo) * (H - 8);
+  const line = (d, st) => `<polyline fill="none" points="${d.map((v, i) => v == null ? '' : `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).filter(Boolean).join(' ')}" ${st}/>`;
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="최근 25일 가격과 이동평균선">${line(xs, 'stroke="#17202A" stroke-width="1.6"')}${line(a5, 'stroke="#0F766E" stroke-width="2"')}${line(a20, 'stroke="#F0A63A" stroke-width="2" stroke-dasharray="5 3"')}</svg>
+  <div class="lgd"><span><i style="border-color:#17202A"></i>종가</span><span><i style="border-color:#0F766E"></i>5일선</span><span><i style="border-color:#F0A63A;border-top-style:dashed"></i>20일선</span></div>`;
+}
+
+function maState(arr) { const m5 = ma(arr, 5), m20 = ma(arr, 20); const l = arr.length - 1; const above = m5[l] > m20[l]; let days = 0; for (let i = l; i >= 19; i--) { if ((m5[i] > m20[i]) === above) days++; else break; } return { above, days }; }
+
+function vBrief() {
+  const B = briefPlan(); const st = S.brief; const al = st.alerts;
+  const holds = [
+    { name: 'KODEX 200', kind: '주식 ETF · 계획 자산', chg: 1.8 },
+    { name: 'KODEX 국고채10년', kind: '채권 ETF · 계획 자산', chg: -0.2 },
+    { name: '삼성전자', kind: '개별 주식 · 별도 보유', chg: -3.2 },
+  ];
+  const chg = v => `<div class="chg ${v > 0 ? 'up' : v < 0 ? 'down' : 'flat'}">${v > 0 ? '+' : ''}${v.toFixed(1)}%${Math.abs(v) >= st.th ? `<small>알림 기준 ±${st.th}% 초과</small>` : ''}</div>`;
+  const dJ = B.p.rows[0].monthly, dY = B.p.rows[1].monthly, dC = B.p.rows[2].monthly, dJu = B.p.rows[3].monthly;
+  const n = Math.min(B.months, 600); const extra = dJ * (0.008 / 12) * n * (n + 1) / 2;
+  const first = B.a.saving + B.a.lump; const pr = Math.min(1, first / B.target);
+  const upS = maState(SERIES.up), dnS = maState(SERIES.dn);
+  const off = (key) => al[key] ? '' : `<div class="card" style="opacity:.6"><div class="hr"><h3 style="margin:0">${{ price: '보유 종목 등락', rate: '더 높은 금리 상품', news: '종목 뉴스 분석', ma: '지표 전망' }[key]}</h3><span class="pill">알림 꺼짐</span></div><div class="muted">설정에서 다시 켤 수 있어요.</div></div>`;
+
+  return `${topBar('오늘의 브리핑', { back: false, right: `<span class="badge">예시 데이터</span><span style="width:8px"></span>` })}
+  <div class="main fade" style="padding-bottom:110px">
+  <div class="sub" style="margin:2px 0 12px">${todayLabel()} ${st.time} · AI가 계좌·시장·뉴스를 한 번에 정리했어요${B.sample ? ' · <b>예시 계획(월 90만·중립형) 기준</b>' : ''}</div>
+
+  <div class="card"><h3>${ico('target', 18)}내 계획 점검</h3>
+    <div class="row first"><span class="k">이번 달 저축 ${won(B.a.saving)}</span><span class="pill ok">진행 중</span></div>
+    <div class="todo first" style="margin-top:6px"><span class="chk on">${ico('check', 14)}</span><div>적금 ${won(dJ, true)} · 예금 ${won(dY, true)} 자동이체 완료<span>${TODAY.getMonth() + 1}월 25일</span></div></div>
+    <div class="todo"><span class="chk"></span><div>채권 ETF ${won(dC, true)} · 주식 ETF ${won(dJu, true)} 정기 매수 예정<span>${TODAY.getMonth() + 1}월 30일 · 계획 비율 채권 ${B.w[2]}% · 주식 ${B.w[3]}%</span></div></div>
+    <div class="progbar"><i style="width:${Math.max(2, Math.round(pr * 100))}%"></i></div>
+    <div class="help" style="margin-top:0"><span>누적 ${won(first)} / 목표 ${won(B.target)}</span><span>${Math.round(pr * 100)}%</span></div>
+  </div>
+
+  ${al.price ? `<div class="card"><h3>${ico('activity', 18)}보유 종목 등락 <span class="muted" style="font-weight:500">전일 대비 · 예시</span></h3>
+    ${holds.map((h, i) => `<div class="tick ${i ? '' : 'first'}"><div><b>${h.name}</b><span>${h.kind}</span></div>${chg(h.chg)}</div>`).join('')}
+    <div class="aisay"><div class="av">AI</div><div>삼성전자가 하루 만에 3% 넘게 빠졌지만 계획 자산이 아니고 전체 자산의 12% 수준이라 목표에 영향은 없어요. 추가 매수는 정기 매수일에 계획 비율대로만 하는 걸 권해요.</div></div>
+  </div>` : off('price')}
+
+  ${al.rate ? `<div class="card"><h3>${ico('bank', 18)}더 높은 금리 상품이 나왔어요</h3>
+    <div class="row first"><span class="k">A은행 정기적금 12개월 <span class="tagx">예시</span></span><span class="v">연 4.3%</span></div>
+    <div class="row"><span class="k">지금 계획의 적금 금리</span><span class="v">연 3.5%</span></div>
+    <div class="row"><span class="k">차이</span><span class="v" style="color:var(--p)">+0.8%p</span></div>
+    <div class="aisay"><div class="av">AI</div><div>적금 ${won(dJ, true)}을 이 상품으로 옮기면 ${n}개월 동안 이자가 약 ${won(extra)} 늘어요(세전, 우대 조건 충족 가정). 우대 조건에 급여이체·카드 실적이 있는지 먼저 확인하세요.</div></div>
+    <div class="muted" style="margin-top:8px">출처: 금융감독원 금융상품통합비교공시 <span class="tagx plan">연동 예정</span> · 기준 시점은 실제 공시 시각으로 표시</div>
+  </div>` : off('rate')}
+
+  ${al.news ? `<div class="card"><h3>${ico('news', 18)}종목 뉴스 호재·악재 분석 <span class="muted" style="font-weight:500">삼성전자 · 예시</span></h3>
+    <div class="news" style="border-top:0;padding-top:0"><span>메모리 가격 하락 전망을 다룬 보도</span><span class="tag badn">악재</span></div>
+    <div class="news"><span>신규 파운드리 수주 발표</span><span class="tag good">호재</span></div>
+    <div class="news"><span>외국인 3거래일 연속 순매도</span><span class="tag badn">악재</span></div>
+    <div class="news"><span>하반기 신제품 출시 일정 보도</span><span class="tag neu">중립</span></div>
+    <div class="aisay"><div class="av">AI</div><div>악재 2건, 호재 1건. 오늘 하락은 메모리 가격 우려가 먼저 반영된 것으로 보여요. 단기 변동은 크지만 실적 발표(다음 달) 전까지는 판단을 미루는 게 낫겠어요.</div></div>
+    <div class="muted" style="margin-top:8px">기사 제목은 예시입니다. 실제 서비스는 언론사 RSS·뉴스 검색 API로 종목 키워드를 모아 AI가 분류해요.</div>
+  </div>` : off('news')}
+
+  ${al.ma ? `<div class="card"><h3>${ico('tup', 18)}지표 전망 <span class="muted" style="font-weight:500">이동평균선 · 예시</span></h3>
+    <div class="hr"><div><b style="font-size:14px">KODEX 200</b> <span class="pill ok">단기 상승 흐름</span></div><span class="muted">${upS.above ? '골든크로스' : '데드크로스'} ${upS.days}일째</span></div>
+    ${spark(SERIES.up)}
+    <div class="sub" style="margin-top:8px">5일선이 20일선 위에 있고 간격이 벌어지는 중이에요. 계획대로 정기 매수를 이어가면 돼요.</div>
+    <div class="hr" style="margin-top:14px"><div><b style="font-size:14px">삼성전자</b> <span class="pill bad">단기 약세</span></div><span class="muted">${dnS.above ? '골든크로스' : '데드크로스'} ${dnS.days}일째</span></div>
+    ${spark(SERIES.dn)}
+    <div class="sub" style="margin-top:8px">5일선이 20일선 아래로 내려온 뒤 회복하지 못하고 있어요. 신규 매수는 5일선이 20일선을 다시 넘을 때까지 기다리는 편이 안전해요.</div>
+    <div class="note">${ico('warn', 16)}<div>전망은 지표 해석일 뿐 수익을 보장하지 않아요. 투자 판단과 책임은 본인에게 있어요.</div></div>
+  </div>` : off('ma')}
+
+  <div class="card"><h3>${ico('list', 18)}오늘 할 일</h3>
+    <div class="todo first"><span class="chk"></span><div>${TODAY.getMonth() + 1}월 30일 정기 매수 금액 확인: 채권 ETF ${won(dC, true)} · 주식 ETF ${won(dJu, true)}</div></div>
+    <div class="todo"><span class="chk"></span><div>A은행 정기적금 우대 조건 확인 후 갈아탈지 결정<span>이자 차이 약 ${won(extra)} (세전)</span></div></div>
+    <div class="todo"><span class="chk"></span><div>삼성전자는 관망. 실적 발표 전까지 추가 매수 없음</div></div>
+  </div>
+
+  <div class="muted" style="text-align:center;padding:4px 0 8px">이 브리핑은 매일 ${st.time}에 자동으로 만들어져요 · <a href="#/settings">알림 설정</a> · <a href="#/data">AI가 학습하는 데이터</a></div>
+  </div>${tabbar('brief')}`;
+}
+
+/* ===== screens/data.js ===== */
+// AI가 학습하는 금융 정보 — 데이터 출처·갱신 주기·생성 순서.
+
+function vData() {
+  const src = [
+    ['activity', '주식 시세·거래량', 'KRX 정보데이터시스템, 증권사 Open API(한국투자증권 KIS Developers 등). 종가·이동평균선·거래량을 매일 계산해요.', '장 마감 후 1회 + 장중 15분', '연동 예정', '실시간 시세 이용 약관 확인 필요'],
+    ['bank', '예금·적금 금리', '금융감독원 금융상품통합비교공시 Open API(정기예금·적금 상품별 금리, 우대 조건).', '매일 1회', '연동 예정', ''],
+    ['house', '대출 금리', '은행연합회 소비자포털 대출금리 비교 공시(주택담보·신용대출).', '월 1회 공시', '연동 예정', 'API 제공 형태 확인 필요'],
+    ['news', '종목 뉴스', '언론사 RSS, 뉴스 검색 API. 보유 종목 키워드로 모아 AI가 호재·악재·중립으로 분류하고 근거 한 줄을 붙여요.', '30분', '연동 예정', ''],
+    ['percent', '기준금리·거시지표', '한국은행 ECOS Open API(기준금리, 물가, 환율).', '발표 시', '연동 예정', ''],
+    ['wallet', '내 계좌·투자 현황', '마이데이터(오픈뱅킹)·증권사 API 연동. 시안에서는 대화로 입력한 값을 써요.', '매일 브리핑 직전', '시안: 수동 입력', '마이데이터 사업자 자격 요건 확인 필요. 토스증권은 공개 API가 없어 증권사 Open API로 대체 검토'],
+  ];
+  return `${topBar('AI가 학습하는 금융 정보', { backTo: 'settings' })}
+  <div class="main fade" style="padding-bottom:100px">
+  <div class="card"><h3>${ico('db', 18)}어떻게 학습하나요</h3><div class="sub">매일 아래 데이터를 모아 정리한 뒤 AI에게 함께 건네요(검색 증강 방식). 금액·비율·이동평균 같은 숫자는 코드가 계산하고, AI는 상황 판단과 설명 문장만 맡아요. 그래서 같은 데이터면 같은 숫자가 나와요.</div>
+    <div class="note">${ico('info', 16)}<div>AI 응답의 숫자는 코드 계산값과 대조해서 다르면 다시 생성해요(본 구현 규칙).</div></div></div>
+  <div class="card">${src.map(([i, t, d, cyc, stt, need], k) => `<div class="src ${k ? '' : 'first'}"><b>${ico(i, 16)}${t} <span class="tagx ${stt.startsWith('연동') ? 'plan' : ''}">${stt}</span></b><p>${d}</p><div class="meta"><span>갱신 ${cyc}</span>${need ? `<span class="tagx need" style="margin:0">확인 필요: ${need}</span>` : ''}</div></div>`).join('')}</div>
+  <div class="card"><h3>${ico('clock', 18)}브리핑이 만들어지는 순서</h3>
+    <div class="sub">매일 ${S.brief.time} 기준. 1) 시세·금리·뉴스 수집 2) 코드가 등락률·이동평균·금리 차이·필요 납입액 계산 3) 알림 기준에 걸린 항목만 추림 4) AI가 항목별 한 줄 설명과 오늘 할 일 작성 5) 푸시 알림 발송, 앱에서 전체 브리핑 열람.</div></div>
+  </div>${tabbar('data')}`;
+}
+
+/* ===== screens/settings.js ===== */
+// 설정 — 브리핑 시간·알림 항목·연결·내 목표.
+
+function vSettings() {
+  const st = S.brief, al = st.alerts;
+  const sw = (key) => `<button class="sw ${al[key] ? 'on' : ''}" role="switch" aria-checked="${al[key]}" aria-label="${key}" onclick="toggleAlert('${key}')"></button>`;
+  const times = ['07:00', '08:00', '09:00', '21:00'];
+  return `${topBar('설정', { back: false })}
+  <div class="main fade" style="padding-bottom:100px">
+  <div class="card"><h3>${ico('bell', 18)}브리핑 알림</h3>
+    <div class="srow first"><div><b>브리핑 시간</b><span>하루 한 번, 이 시간에 푸시로 보내요</span></div><span class="mid">${st.time}</span></div>
+    <div class="mini">${times.map(t => `<button class="${st.time === t ? 'on' : ''}" onclick="setTime('${t}')">${t}</button>`).join('')}</div>
+  </div>
+  <div class="card"><h3>${ico('list', 18)}알림 항목</h3>
+    <div class="srow first"><div><b>보유 종목 등락</b><span>하루 등락이 기준을 넘으면 알려요</span></div>${sw('price')}</div>
+    <div class="mini" style="margin-top:0;margin-bottom:6px">${[2, 3, 5].map(t => `<button class="${st.th === t ? 'on' : ''}" onclick="setTh(${t})">±${t}%</button>`).join('')}</div>
+    <div class="srow"><div><b>더 높은 금리 상품</b><span>내 적금·예금보다 0.5%p 이상 높은 상품이 나오면</span></div>${sw('rate')}</div>
+    <div class="srow"><div><b>종목 뉴스 호재·악재 분석</b><span>보유 종목 기사를 AI가 분류해 요약</span></div>${sw('news')}</div>
+    <div class="srow"><div><b>지표 전망</b><span>이동평균선 등 지표로 단기 흐름 안내</span></div>${sw('ma')}</div>
+  </div>
+  <div class="card"><h3>${ico('link', 18)}연결</h3>
+    <div class="srow first"><div><b>은행 계좌 연동</b><span>마이데이터로 잔액·자동이체 확인</span></div><span class="pill">예정</span></div>
+    <div class="srow"><div><b>증권 계좌 연동</b><span>보유 종목·평가금액 자동 반영</span></div><span class="pill">예정</span></div>
+    <div class="srow"><div><b>AI가 학습하는 금융 정보</b><span>데이터 출처와 갱신 주기</span></div><a href="#/data" class="link" style="display:flex;align-items:center">보기 ${ico('right', 16)}</a></div>
+  </div>
+  <div class="card"><h3>${ico('target', 18)}내 목표</h3>
+    ${planReady() ? `<div class="srow first"><div><b>${S.a.goalType === 'house' ? `집 사기 · 집값 ${won(S.a.amount)}` : `${GOAL_LABEL[S.a.goalType]} ${won(S.a.amount)}`}</b><span>${S.a.months ? `${S.a.months}개월` : '기간 미정'} · 월 ${won(S.a.saving)} · ${S.planRisk || S.a.risk}</span></div><a href="#/plan" class="link" style="display:flex;align-items:center">계획 ${ico('right', 16)}</a></div>` : `<div class="srow first"><div><b>아직 목표가 없어요</b><span>대화로 목표를 정하면 브리핑이 내 계획 기준으로 바뀌어요</span></div></div>`}
+    <div class="srow"><div><b>목표 다시 정하기</b><span>처음부터 대화를 다시 시작해요</span></div><button class="btn sm ghost" onclick="startChat()">다시 시작</button></div>
+  </div>
+  </div>${tabbar('settings')}`;
+}
+
+function toggleAlert(k) { S.brief.alerts[k] = !S.brief.alerts[k]; render(); }
+
+function setTime(t) { S.brief.time = t; render(); }
+
+function setTh(t) { S.brief.th = t; render(); }
+
+/* ===== router.js ===== */
+// 해시 라우터 — 화면 전환과 렌더링 진입점.
+
+function route() { const h = location.hash.replace(/^#\/?/, ''); return h || 'start'; }
+
+function go(r) { location.hash = r === 'start' ? '#/' : '#/' + r; }
+
+function planReady() { return S.a.risk != null; }
+
+function render() {
+  let r = route();
+  if (r === 'plan' && !planReady()) { go('chat'); return; }
+  const app = $('#app');
+  const view = { start: vStart, chat: vChat, plan: vPlan, brief: vBrief, data: vData, settings: vSettings }[r] || vStart;
+  app.innerHTML = strip() + view();
+  window.scrollTo(0, 0);
+  if (r === 'chat') afterChat();
+}
+
+/* ===== main.js ===== */
+// 부팅 — 화면은 문자열 템플릿으로 그리고 인라인 onclick으로 함수를 부른다.
+// 모듈 스코프는 전역이 아니므로, 템플릿에서 부르는 함수만 여기서 window에 노출한다.
+// (본 구현에서 React로 옮길 때 이 파일이 사라지고 각 화면이 컴포넌트가 된다.)
+
+Object.assign(window, {
+  go, startChat, fillExample, openSheet, closeSheet,
+  onNumKey, onNumBeforeInput, onFocusNum, live, submitInput, chip, undo, setMode,
+  pickSuggest, setRisk, applyMonths, applySaving, applyRisk,
+  toggleAlert, setTime, setTh,
+});
+
+window.addEventListener('hashchange', render);
+render();
+</script>

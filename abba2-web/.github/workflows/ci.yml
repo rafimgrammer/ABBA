@@ -1,0 +1,22 @@
+name: abba2-web CI
+# 빌드가 최신인지 확인하고, 임포트 누락 검사와 UI 테스트를 돌린다.
+on:
+  push: { branches: ['**'] }
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install playwright && playwright install --with-deps chromium
+      - name: 임포트 누락 검사
+        run: python3 tests/check_imports.py
+      - name: 빌드 결과가 최신인지 확인
+        run: |
+          python3 build.py
+          git diff --exit-code dist/ || (echo "dist/가 src/와 다릅니다. python3 build.py 후 커밋하세요." && exit 1)
+      - name: UI 테스트 (단일 파일)
+        run: python3 tests/test_ui.py dist
