@@ -118,14 +118,17 @@ export function Chat() {
     update();
   }, [c]);
 
-  // 새 말풍선이 붙을 때마다 맨 아래로.
-  useEffect(() => { window.scrollTo(0, document.body.scrollHeight); }, [c.log.length, c.busy]);
+  // 새 말풍선이 붙을 때마다 맨 아래로. 다만 내용이 화면을 넘칠 때만 —
+  // 넓은 화면에서는 대화가 다 들어와서, 그냥 내리면 헤더(진행도)만 잘려 보인다.
+  useEffect(() => {
+    if (document.body.scrollHeight > window.innerHeight + 24) window.scrollTo(0, document.body.scrollHeight);
+  }, [c.log.length, c.busy]);
 
   return (
     <>
       <TopBar title="목적 설정" backTo="start" bar={Math.round(p.done / p.total * 100)}
         right={<span className="prog">{p.done}/{p.total}</span>} />
-      <div className="main" style={{ paddingBottom: 230 }}>
+      <div className="main chatmain">
         <div className="log" id="log" ref={logRef}>
           {c.log.map((m, i) => m.who === 'ai'
             ? <div className="msg ai" key={i}><div className="av">AI</div><div className="bub">{m.text}</div></div>

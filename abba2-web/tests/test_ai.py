@@ -100,6 +100,35 @@ async def main():
             why = await wait_card(pg, timeout=3000)
             check(f'되돌리면 캐시로 즉시 표시 ({time.time() - t1:.1f}초)', not why and time.time() - t1 < 3, why)
 
+        # ---- 물어보기: 답해야 할 것과 거절해야 할 것 ----
+        card = pg.locator('.card').filter(has=pg.locator('input[aria-label="계획에 대한 질문"]')).first
+        await card.scroll_into_view_if_needed()
+        await pg.click('button.chip:has-text("왜 이런 비율로")')
+        try:
+            await pg.wait_for_function('() => S.ask.items.length > 0 || S.ask.error', timeout=60000)
+        except Exception:
+            pass
+        st = await pg.evaluate('() => ({ n: S.ask.items.length, e: S.ask.error })')
+        if st['n']:
+            it = await pg.evaluate('() => S.ask.items[0]')
+            check('물어보기: 계획 질문에 답함', it['answerable'], it['answer'][:60])
+            check('물어보기: 근거 항목 제시', len(it['basis']) >= 1, it['basis'])
+            bad = sorted(t for t in toks(it['answer']) if t not in allow)
+            check('물어보기: 답의 숫자가 엔진 값에 있음', not bad, bad)
+
+            inp = card.locator('input[aria-label="계획에 대한 질문"]')
+            await inp.fill('삼성전자 지금 사야 할까요?')
+            await inp.press('Enter')
+            try:
+                await pg.wait_for_function('() => S.ask.items.length > 1 || S.ask.error', timeout=60000)
+            except Exception:
+                pass
+            if await pg.evaluate('() => S.ask.items.length') > 1:
+                it2 = await pg.evaluate('() => S.ask.items[1]')
+                check('물어보기: 종목 추천은 거절', not it2['answerable'], it2['answer'][:60])
+        else:
+            check('물어보기: 계획 질문에 답함', False, st['e'])
+
         check('콘솔·페이지 에러 없음', not errs, errs[:3])
         await b.close()
     print(f'\n{len(PASS)} passed, {len(FAIL)} failed')

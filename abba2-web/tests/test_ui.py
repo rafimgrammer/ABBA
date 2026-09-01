@@ -261,10 +261,32 @@ async def main():
             check('템플릿 폴백 표현 위반 없음', tp['phrase'] == [], tp['phrase'])
             check('템플릿 폴백에 실행 단계·중간 점검 포함', tp['steps'] >= 3 and tp['miles'] >= 1, tp)
 
-            # 없는 화면으로 들어가면 랜딩으로 되돌린다
-            await pg.goto(URL + '#/nope'); await pg.wait_for_timeout(400)
-            check('없는 경로는 랜딩으로 리다이렉트', (await pg.evaluate('location.hash')) == '#/')
-            await pg.goto(URL + '#/plan'); await pg.wait_for_timeout(300)
+                # 물어보기: 바꿔보기 표가 엔진 값으로 미리 계산되는지 + 질문 정리
+            ak = await pg.evaluate("""() => {
+              const risk = S.planRisk || S.a.risk;
+              const c = planCalc(S.a, risk);
+              const wi = ASK.whatIfTable(S.a, c, risk);
+              const facts = ASK.askFacts(S.a, c, risk);
+              return { rows: wi.length, hasAggr: wi.some(x => x.includes('공격형')),
+                       hasFacts: facts.includes('[바꿔보기'),
+                       // 바꿔보기 값도 허용 토큰에 들어가야 가정 질문 답이 검증을 통과한다
+                       covered: COACH.verify({ x: wi.join(' ') }, COACH.allowList(facts)),
+                       long: ASK.cleanQuestion(' a '.repeat(300)).length,
+                       qs: ASK.suggestedQuestions(c).length };
+            }""")
+            check('바꿔보기 표를 엔진이 미리 계산', ak['rows'] >= 5 and ak['hasAggr'], ak)
+            check('바꿔보기가 팩트시트에 포함', ak['hasFacts'])
+            check('바꿔보기 값이 허용 토큰에 포함', ak['covered'] == [], ak['covered'])
+            check('질문 길이 200자로 제한', ak['long'] <= 200, ak['long'])
+            check('추천 질문 3개 이상', ak['qs'] >= 3, ak['qs'])
+
+        check('물어보기 카드 표시', await pg.is_visible('text=이 계획에 대해 궁금한 걸'))
+        check('물어보기 범위 고지', '종목 추천이나 시장 예측은 답하지 않아요' in await pg.inner_text('.main'))
+
+        # 없는 화면으로 들어가면 랜딩으로 되돌린다
+        await pg.goto(URL + '#/nope'); await pg.wait_for_timeout(400)
+        check('없는 경로는 랜딩으로 리다이렉트', (await pg.evaluate('location.hash')) == '#/')
+        await pg.goto(URL + '#/plan'); await pg.wait_for_timeout(300)
         # 설정에서 끄면 카드가 사라진다
         await pg.click('a[href="#/settings"]'); await pg.wait_for_timeout(200)
         check('설정에 AI 스위치', await pg.is_visible('button.sw[aria-label="ai"]'))
