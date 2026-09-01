@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+._*
+__MACOSX/
+
+# 의존성 / 캐시
+node_modules/
+.vite/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.vscode/
+
+# 빌드 산출물 — 키가 주입되어 나오므로 저장소에 넣지 않는다.
+# 필요하면 `npm run build`로 언제든 다시 만든다.
+dist/
+
+# API 키 — 절대 커밋하지 않는다
+.env
+.env.local
+.env.*.local
