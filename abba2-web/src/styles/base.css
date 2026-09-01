@@ -5,7 +5,7 @@ body{min-height:100dvh}
 button{font-family:inherit;cursor:pointer}
 a{color:inherit}
 .frame{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column}
-@media(min-width:600px){body{background:#E9ECF0}.frame{box-shadow:0 0 0 1px var(--ln)}}
+/* 넓은 화면 대응은 styles/desktop.css 에 모아 두었다. */
 
 .strip{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px;background:#17202A;color:#C9D1D9;font-size:12px;height:34px}
 .strip b{color:#fff;font-weight:600}

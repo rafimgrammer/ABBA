@@ -83,7 +83,7 @@ export function Settings() {
   return (
     <>
       <TopBar title="설정" back={false} />
-      <div className="main fade" style={{ paddingBottom: 100 }}>
+      <div className="main fade cards" style={{ paddingBottom: 100 }}>
         <div className="card">
           <h3><Icon name="bell" size={18} />브리핑 알림</h3>
           <SRow first title="브리핑 시간" desc="하루 한 번, 이 시간에 푸시로 보내요"><span className="mid">{st.time}</span></SRow>

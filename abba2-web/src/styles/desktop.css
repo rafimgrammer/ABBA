@@ -1,0 +1,84 @@
+/* 넓은 화면(≥900px)에서의 앱 화면 — 랜딩과 같은 웹 화면으로 보이게 한다.
+   모바일(<900px)은 손대지 않는다. UI 테스트도 390px에서 돌아 영향이 없다.
+
+   기본 설계가 430px 프레임이라, 데스크탑에서는 세 가지만 바꾼다.
+     1) 프레임을 넓히고 회색 여백 대신 지면색을 깐다
+     2) 하단 고정 탭바 → 상단 가로 내비 (데스크탑에서 하단 고정은 어색하다)
+     3) 카드 목록은 2단으로 흘린다 (대화 화면은 한 줄로 읽어야 하므로 제외) */
+
+@media (min-width:900px){
+  .frame{
+    max-width:1080px;
+    background:var(--bg);
+    padding-bottom:40px;
+  }
+
+  /* ---- 배치 순서: 상단 띠 → 내비 → 페이지 헤더 → 본문 ----
+     .frame의 직계 자식은 .strip / .top / .bar / .main / .tabbar 다(프래그먼트가 평탄화된다).
+     탭바만 위로 올리면 상단 띠에 가려지므로 셋 다 순서를 못박는다. */
+  .frame > .strip{order:-3}
+  .frame > nav.tabbar{order:-2}
+  .frame > .top{order:-1}
+  .frame > .bar{order:-1}
+
+  /* ---- 헤더 ---- */
+  .top{
+    height:64px; padding:0 24px;
+    border-bottom:1px solid var(--ln);
+    margin-bottom:8px;
+    position:static;              /* 내비가 이미 고정돼 있어 헤더까지 붙일 필요는 없다 */
+  }
+  .top h2{font-size:22px; letter-spacing:-.4px}
+  .bar{margin:0 24px}
+
+  .main{padding:16px 24px 40px}
+
+  /* ---- 카드 2단 ---- */
+  /* 카드가 독립 블록이라 다단 흐름이 가장 자연스럽다. 높이가 제각각이어도 빈칸이 안 생긴다. */
+  .main.cards{column-count:2; column-gap:20px}
+  .main.cards > *{break-inside:avoid; -webkit-column-break-inside:avoid}
+  .main.cards > .segp{column-span:all}          /* 성향 선택은 가로로 펼친다 */
+  .main.cards > .card:first-child{column-span:all}  /* 요약 카드도 상단 전폭 */
+
+  /* ---- 하단 고정 요소 해제 ---- */
+  .cta, .cta.tabbed{
+    position:static; transform:none; max-width:none; width:auto;
+    background:none; padding:0 24px 8px;
+  }
+  .cta .btn{max-width:360px; margin:0 auto}
+
+  .composer{
+    position:static; transform:none; max-width:none; width:auto;
+    border-top:1px solid var(--ln); background:var(--sf);
+    padding:16px 24px 20px; border-radius:18px; margin:0 24px;
+  }
+  .composer .chips{justify-content:flex-start}
+
+  /* ---- 탭바를 상단 가로 내비로 ---- */
+  .tabbar{
+    position:sticky; top:34px; bottom:auto;   /* 상단 띠(34px) 바로 아래 */
+    transform:none; max-width:none; width:auto;
+    flex-direction:row; justify-content:flex-end; gap:6px;
+    border-top:0; border-bottom:1px solid var(--ln);
+    padding:8px 24px; background:var(--bg); z-index:21;
+  }
+  .tabbar a{
+    flex:0 0 auto; flex-direction:row; gap:7px;
+    padding:9px 16px; border-radius:11px; font-size:14px;
+  }
+  .tabbar a.on{background:var(--ps)}
+
+  /* ---- 대화 화면은 읽기 좋은 폭으로 ---- */
+  .chatmain{padding-bottom:24px}      /* 입력창이 더 이상 떠 있지 않다 */
+  .log{max-width:720px; margin:0 auto}
+  .msg{max-width:78%}
+  /* flex 자식에 margin:auto만 주면 내용 크기로 줄어든다. 폭을 명시해야 720px로 선다. */
+  .composer{width:100%; max-width:720px; margin:0 auto; border:1px solid var(--ln)}
+  .composer .btn{max-width:320px; margin:0 auto}   /* 전폭 버튼은 데스크탑에서 과하다 */
+  .composer .irow{max-width:560px}
+}
+
+@media (min-width:1200px){
+  .main.cards{column-gap:24px}
+  .frame{max-width:1160px}
+}

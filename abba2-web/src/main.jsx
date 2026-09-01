@@ -6,6 +6,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/screens.css';
+import './styles/desktop.css';
 import './styles/home.css';
 import { App } from './App.jsx';
 import { ENGINE } from './lib/engine.js';
@@ -13,10 +14,12 @@ import { S } from './store.js';
 import { go } from './routing.js';
 import { planCalc } from './lib/plan.js';
 import { factSheet, allowList, verify, tokens, checkPhrases, templatePlan } from './lib/coach.js';
+import { whatIfTable, askFacts, suggestedQuestions, cleanQuestion } from './lib/ask.js';
 
 // 계산 엔진과 숫자 검증기는 콘솔·UI 테스트에서 직접 두드려 보므로 전역에 남겨 둔다.
 // (검증 로직은 네트워크 없이도 확인할 수 있어야 한다.)
-Object.assign(window, { ENGINE, S, go, planCalc, COACH: { factSheet, allowList, verify, tokens, checkPhrases, templatePlan } });
+Object.assign(window, { ENGINE, S, go, planCalc, COACH: { factSheet, allowList, verify, tokens, checkPhrases, templatePlan },
+  ASK: { whatIfTable, askFacts, suggestedQuestions, cleanQuestion } });
 
 createRoot(document.getElementById('root')).render(
   <StrictMode><App /></StrictMode>

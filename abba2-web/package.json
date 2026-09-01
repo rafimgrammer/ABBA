@@ -1,6 +1,6 @@
 {
   "name": "abba2-web",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "private": true,
   "type": "module",
   "description": "ABBA 2.0 — 묻기 전에 먼저 알려주는 AI 재테크 코치 (React 시안)",

@@ -8,6 +8,7 @@ import { S, GOAL_LABEL, update, useStore, toast } from '../store.js';
 import { planCalc, suggestGoal as calcSuggestGoal } from '../lib/plan.js';
 import { go } from '../routing.js';
 import { AiCoachCard } from '../components/AiCoachCard.jsx';
+import { AskCard } from '../components/AskCard.jsx';
 
 /** 화면은 늘 현재 상태(S)를 본다. 계산 자체는 lib/plan.js에 있다. */
 function suggestGoal(n) { return calcSuggestGoal(S.a, S.planRisk || S.a.risk, n); }
@@ -202,7 +203,7 @@ export function Plan() {
     <>
       <TopBar title="추천 계획" backTo="chat"
         right={<button className="ib" aria-label="답변 수정" onClick={() => go('chat')}><Icon name="pencil" size={20} /></button>} />
-      <div className="main fade" style={{ paddingBottom: 150 }}>
+      <div className="main fade cards" style={{ paddingBottom: 150 }}>
         {a.goalType === 'none' && <SuggestCard a={a} risk={risk} />}
 
         <div className="card">
@@ -227,6 +228,7 @@ export function Plan() {
         <AdjustCard c={c} a={a} risk={risk} />
         {c.house && <LoanCard c={c} />}
         <AiCoachCard a={a} c={c} risk={risk} />
+        <AskCard a={a} c={c} risk={risk} />
         <AssumeCard />
       </div>
       <div className="cta tabbed"><button className="btn" onClick={() => go('brief')}><Icon name="bell" size={18} /> 매일 브리핑 받기</button></div>

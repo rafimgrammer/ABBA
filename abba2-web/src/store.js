@@ -24,6 +24,8 @@ const S = {
   toast: null,    // { id, msg }
   // AI 상세 계획. 실제 호출은 aiCoach.js가 하고 여기엔 결과만 둔다.
   ai: { on: true, status: 'idle', planKey: null, data: null, meta: null, error: null },
+  // 계획에 대해 물어보기. 호출은 askPlan.js가 한다.
+  ask: { items: [], busy: false, error: null },
 };
 
 // ---- 구독 ----

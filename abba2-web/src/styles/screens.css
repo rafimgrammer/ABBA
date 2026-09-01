@@ -11,6 +11,7 @@
 .step span{font-size:13px;color:var(--t2);line-height:1.5}
 
 /* chat */
+.chatmain{padding-bottom:230px}   /* 하단 고정 입력창 높이만큼 비워둔다 */
 .log{display:flex;flex-direction:column;gap:10px;padding-bottom:8px}
 .msg{display:flex;gap:8px;max-width:90%}
 .msg.ai{align-self:flex-start}
@@ -146,3 +147,20 @@ pre.facts{white-space:pre-wrap;word-break:break-all;font-family:ui-monospace,SFM
 .amile b{font-size:14px;font-weight:600}
 .amile .v{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
 .amile span{display:block;font-size:12px;color:var(--t3);line-height:1.5;margin-top:2px}
+
+/* ask — 계획 화면의 "물어보기" 카드 */
+.qa{margin-top:14px;display:flex;flex-direction:column;gap:14px}
+.qaitem{padding-top:14px;border-top:1px solid var(--ln)}
+.qa .qaitem:first-child{padding-top:0;border-top:0}
+.qq{display:flex;gap:8px;font-size:14px;font-weight:600;line-height:1.5;margin-bottom:8px}
+.qa-a{display:flex;gap:8px}
+.qa-a.off p{color:var(--t2)}
+.qq .who,.qa-a .who{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-top:1px}
+.qq .who{background:var(--sf2);color:var(--t2)}
+.qa-a .who{background:var(--p);color:#fff}
+.qa-a p{font-size:14px;line-height:1.6;color:var(--t1);margin:0}
+.basis{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.basis li{display:flex;gap:6px;align-items:flex-start;font-size:12px;color:var(--t3);line-height:1.5}
+.basis li svg{color:var(--p);flex-shrink:0;margin-top:3px}
+.qmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.qmeta .tagx{margin-left:0}

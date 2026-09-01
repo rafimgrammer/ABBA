@@ -109,7 +109,7 @@ export function Brief() {
     <>
       <TopBar title="오늘의 브리핑" back={false}
         right={<><span className="badge">예시 데이터</span><span style={{ width: 8 }} /></>} />
-      <div className="main fade" style={{ paddingBottom: 110 }}>
+      <div className="main fade cards" style={{ paddingBottom: 110 }}>
         <div className="sub" style={{ margin: '2px 0 12px' }}>
           {todayLabel()} {st.time} · AI가 계좌·시장·뉴스를 한 번에 정리했어요
           {B.sample && <> · <b>예시 계획(월 90만·중립형) 기준</b></>}

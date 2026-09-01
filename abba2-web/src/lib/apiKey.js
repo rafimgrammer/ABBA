@@ -11,7 +11,11 @@
 //   백엔드(Supabase Edge Function)로 옮길 때 고칠 파일은 이 파일과 gemini.js 둘뿐이다.
 
 // Vite가 빌드할 때 값을 끼워 넣는다. .env.local이 없으면 빈 문자열이 된다.
-const FROM_ENV = import.meta.env?.VITE_GEMINI_API_KEY ?? '';
+// Node로 lib을 직접 돌려 검증할 때는 process.env에서 읽는다(그 경로를 살려두려는 목적).
+const FROM_ENV =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
+  globalThis.process?.env?.VITE_GEMINI_API_KEY ||
+  '';
 
 const LS = 'abba2.gemini.key';
 

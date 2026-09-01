@@ -18,7 +18,7 @@ export function Data() {
   return (
     <>
       <TopBar title="AI가 학습하는 금융 정보" backTo="settings" />
-      <div className="main fade" style={{ paddingBottom: 100 }}>
+      <div className="main fade cards" style={{ paddingBottom: 100 }}>
         <div className="card">
           <h3><Icon name="db" size={18} />어떻게 학습하나요</h3>
           <div className="sub">매일 아래 데이터를 모아 정리한 뒤 AI에게 함께 건네요(검색 증강 방식). 금액·비율·이동평균 같은 숫자는 코드가 계산하고, AI는 상황 판단과 설명 문장만 맡아요. 그래서 같은 데이터면 같은 숫자가 나와요.</div>
