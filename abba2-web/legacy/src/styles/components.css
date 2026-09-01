@@ -1,0 +1,47 @@
+/* 재사용 UI — 카드·버튼·CTA·탭바·배지·시트·토스트. */
+
+.main{padding:8px 16px 150px;flex:1}
+h1{font-size:22px;font-weight:700;line-height:1.35;letter-spacing:-.2px;margin:8px 0 14px}
+.card{background:var(--sf);border-radius:18px;padding:18px 16px;margin-bottom:12px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card h3 svg{color:var(--p)}
+.sub{color:var(--t2);font-size:13px;line-height:1.55}
+.muted{color:var(--t3);font-size:12px;line-height:1.5}
+.big{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.5px;line-height:1.2}
+.mid{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--sf2);color:var(--t2);white-space:nowrap}
+.pill.ok{background:#E3F5EA;color:#157A43}.pill.warn{background:#FCEFDF;color:#A85A08}.pill.bad{background:#FDE8E9;color:#B4232A}.pill.info{background:var(--ps);color:var(--p)}
+.hr{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--ln);font-size:14px}
+.row.first{border-top:0;padding-top:0}
+.row .k{color:var(--t2)}
+.row .v{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:56px;border:0;border-radius:16px;background:var(--p);color:#fff;font-size:16px;font-weight:600}
+.btn:active{background:var(--pp)}
+.btn:disabled{background:#D5DAE0;color:#fff;cursor:default}
+.btn.ghost{background:var(--sf);color:var(--t1);border:1px solid var(--ln)}
+.btn.sm{height:38px;font-size:13px;border-radius:11px;width:auto;padding:0 12px;flex-shrink:0}
+.btn.sm.ghost{background:var(--sf)}
+.cta{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(244,246,248,0),var(--bg) 35%);z-index:25}
+.cta.tabbed{bottom:66px}
+.cta .sub2{display:block;text-align:center;margin-top:10px;color:var(--t2);font-size:13px;background:transparent;border:0}
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;display:flex;background:var(--sf);border-top:1px solid var(--ln);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:26}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;color:var(--t3);font-size:11px;font-weight:500;text-decoration:none}
+.tabbar a.on{color:var(--p);font-weight:600}
+.link{background:transparent;border:0;color:var(--p);font-weight:600;font-size:13px;padding:0}
+.note{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sf2);font-size:12px;color:var(--t2);line-height:1.5;margin-top:10px}
+.note svg{flex-shrink:0;color:var(--t3);margin-top:1px}
+.tagx{display:inline-block;font-size:11px;font-weight:600;padding:1px 6px;border-radius:5px;background:var(--sf2);color:var(--t2);vertical-align:1px;margin-left:4px}
+.tagx.need{background:#FCEFDF;color:#A85A08}
+.tagx.plan{background:var(--ps);color:var(--p)}
+
+
+/* sheet & toast */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:430px;background:var(--sf);border-radius:20px 20px 0 0;padding:14px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h4{font-size:15px;font-weight:600;margin:4px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.sheet a{display:flex;justify-content:space-between;align-items:center;padding:13px 4px;border-top:1px solid var(--ln);text-decoration:none;font-size:15px;font-weight:500}
+.sheet a span{font-size:12px;color:var(--t3);font-weight:400}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;background:#17202A;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;z-index:50;white-space:nowrap}
+.fade{animation:fade .18s ease-out}

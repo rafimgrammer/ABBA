@@ -9,7 +9,7 @@ import engine_ref as E
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 TARGET = sys.argv[1] if len(sys.argv) > 1 else 'dist'
-URL = 'file://' + os.path.join(ROOT, 'dist/abba2.html') if TARGET == 'dist' else 'http://localhost:8000/index.html'
+URL = 'file://' + os.path.join(ROOT, 'dist/abba2.html') if TARGET == 'dist' else 'http://localhost:5173/'
 M = 10000
 PASS = []; FAIL = []
 def check(name, cond, detail=''):
@@ -93,8 +93,10 @@ async def main():
         await type_num(pg, '-250')
         check('"-250" 타이핑 → 250만 남음', await pg.input_value('#num') == '250')
         check('음수 기호를 뺀 값으로 정상 진행', not await pg.is_disabled('#send') and '= 250만 원' in await pg.inner_text('#helpL'))
-        await pg.fill('#num', '')
-        await pg.evaluate("""() => { const el = document.getElementById('num'); el.value = '-250'; el.dispatchEvent(new Event('input', { bubbles: true })); }""")
+        # 붙여넣기: el.value 직접 대입은 React의 값 추적기가 걸러내는 합성 경로라 실제 동작과 다르다.
+        # insert_text는 브라우저 편집 파이프라인(beforeinput/input)을 그대로 타므로 진짜 붙여넣기와 같다.
+        await pg.fill('#num', ''); await pg.click('#num')
+        await pg.keyboard.insert_text('-250')
         check('붙여넣기 경로도 음수 제거 + 안내', await pg.input_value('#num') == '250' and '음수는 입력할 수 없어요' in await pg.inner_text('#helpL'))
         await pg.fill('#num', ''); await pg.click('#num'); await pg.press('#num', 'a')
         check('숫자가 아닌 글자키 → 숫자만 안내', '숫자만 입력할 수 있어요' in await pg.inner_text('#helpL'))

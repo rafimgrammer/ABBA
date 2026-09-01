@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+._*
+__MACOSX/
+
+# 의존성 / 빌드 캐시
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+.env
+.vscode/
