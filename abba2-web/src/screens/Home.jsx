@@ -6,7 +6,8 @@ import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon.jsx';
 import { ENGINE } from '../lib/engine.js';
 import { M } from '../lib/config.js';
-import { startChat, fillExample, toast } from '../store.js';
+import { startChat, fillExample, toast, useStore, logout } from '../store.js';
+import { supabase } from '../supabaseClient.js';
 
 /** 구글 로고는 라인 아이콘이 아니라 색이 정해진 마크라 따로 그린다. */
 function GoogleMark() {
@@ -20,7 +21,15 @@ function GoogleMark() {
   );
 }
 
-const login = () => toast('구글 로그인은 곧 연결돼요');
+/** 구글 OAuth 로그인. 성공하면 구글 로그인 창으로 넘어가고,
+ * 완료 후 Supabase가 설정된 리디렉션 주소로 사용자를 돌려보낸다. */
+const login = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: `${window.location.origin}/#/chat` },
+  });
+  if (error) toast('로그인에 실패했어요. 다시 시도해 주세요');
+};
 
 function Bullet({ children }) {
   return <li><Icon name="check" size={15} stroke={2.4} />{children}</li>;
@@ -28,8 +37,16 @@ function Bullet({ children }) {
 
 const NAV = [['#features', '기능'], ['#how', '작동 방식'], ['#preview', '미리보기'], ['#briefing', '아침 브리핑'], ['#safety', '안전장치']];
 
+/** 로그인한 사용자의 표시 이름. 구글 프로필 이름이 없으면 이메일로 대체. */
+function displayName(user) {
+  return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || '내 계정';
+}
+
 function Nav() {
   const [open, setOpen] = useState(false);
+  const s = useStore();
+  const user = s.user;
+
   return (
     <header className="nav">
       <div className="wrap">
@@ -39,8 +56,17 @@ function Nav() {
             {NAV.map(([h, t]) => <a key={h} href={h}>{t}</a>)}
           </nav>
           <div className="nav-right">
-            <button className="btn btn-quiet" onClick={login}>로그인</button>
-            <button className="btn btn-primary" onClick={login}>Google로 시작하기<Icon name="arrowRight" size={18} /></button>
+            {user ? (
+              <>
+                <span className="nav-user" title={user.email}>{displayName(user)}</span>
+                <button className="btn btn-quiet" onClick={logout}>로그아웃</button>
+              </>
+            ) : (
+              <>
+                <button className="btn btn-quiet" onClick={login}>로그인</button>
+                <button className="btn btn-primary" onClick={login}>Google로 시작하기<Icon name="arrowRight" size={18} /></button>
+              </>
+            )}
             <button className="nav-toggle" type="button" aria-expanded={open} aria-controls="navDrawer" onClick={() => setOpen(v => !v)}>
               <Icon name="menu" size={17} />메뉴
             </button>
@@ -48,7 +74,9 @@ function Nav() {
         </div>
         <nav className={`nav-drawer neu-soft${open ? ' open' : ''}`} id="navDrawer" aria-label="모바일 메뉴" onClick={() => setOpen(false)}>
           {NAV.map(([h, t]) => <a key={h} href={h}>{t}</a>)}
-          <button className="btn btn-primary drawer-cta" onClick={login}>Google로 시작하기</button>
+          {user
+            ? <button className="btn btn-quiet drawer-cta" onClick={logout}>로그아웃 ({displayName(user)})</button>
+            : <button className="btn btn-primary drawer-cta" onClick={login}>Google로 시작하기</button>}
         </nav>
       </div>
     </header>
