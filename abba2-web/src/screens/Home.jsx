@@ -8,6 +8,7 @@ import { ENGINE } from '../lib/engine.js';
 import { M } from '../lib/config.js';
 import { startChat, fillExample, toast, useStore, logout } from '../store.js';
 import { supabase } from '../supabaseClient.js';
+import { go } from '../routing.js';
 
 /** 구글 로고는 라인 아이콘이 아니라 색이 정해진 마크라 따로 그린다. */
 function GoogleMark() {
@@ -22,11 +23,13 @@ function GoogleMark() {
 }
 
 /** 구글 OAuth 로그인. 성공하면 구글 로그인 창으로 넘어가고,
- * 완료 후 Supabase가 설정된 리디렉션 주소로 사용자를 돌려보낸다. */
+ * 완료 후 Supabase가 세션을 만들면 store.js가 자동으로 #/chat으로 보낸다.
+ * redirectTo에는 해시 경로를 넣지 않는다 — 인증 코드가 해시 뒤에 붙으면
+ * 정상적인 쿼리 파라미터로 인식되지 않기 때문이다. */
 const login = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${window.location.origin}/#/chat` },
+    options: { redirectTo: window.location.origin },
   });
   if (error) toast('로그인에 실패했어요. 다시 시도해 주세요');
 };
@@ -42,10 +45,8 @@ function displayName(user) {
   return user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || '내 계정';
 }
 
-function Nav() {
+function Nav({ user }) {
   const [open, setOpen] = useState(false);
-  const s = useStore();
-  const user = s.user;
 
   return (
     <header className="nav">
@@ -59,6 +60,7 @@ function Nav() {
             {user ? (
               <>
                 <span className="nav-user" title={user.email}>{displayName(user)}</span>
+                <a className="btn btn-quiet" href="#/mypage">마이페이지</a>
                 <button className="btn btn-quiet" onClick={logout}>로그아웃</button>
               </>
             ) : (
@@ -74,9 +76,14 @@ function Nav() {
         </div>
         <nav className={`nav-drawer neu-soft${open ? ' open' : ''}`} id="navDrawer" aria-label="모바일 메뉴" onClick={() => setOpen(false)}>
           {NAV.map(([h, t]) => <a key={h} href={h}>{t}</a>)}
-          {user
-            ? <button className="btn btn-quiet drawer-cta" onClick={logout}>로그아웃 ({displayName(user)})</button>
-            : <button className="btn btn-primary drawer-cta" onClick={login}>Google로 시작하기</button>}
+          {user ? (
+            <>
+              <a className="btn btn-primary drawer-cta" href="#/mypage">마이페이지</a>
+              <button className="btn btn-quiet drawer-cta" onClick={logout}>로그아웃 ({displayName(user)})</button>
+            </>
+          ) : (
+            <button className="btn btn-primary drawer-cta" onClick={login}>Google로 시작하기</button>
+          )}
         </nav>
       </div>
     </header>
@@ -283,10 +290,13 @@ const GUARDS = [
 ];
 
 export function Home() {
+  const s = useStore();
+  const user = s.user;
+
   return (
     <div className="site">
       <a className="skip" href="#main">본문으로 건너뛰기</a>
-      <Nav />
+      <Nav user={user} />
 
       <main id="main">
         <section className="hero">
@@ -304,8 +314,17 @@ export function Home() {
                 그다음부터는 매일 아침, 내 계획과 관련된 것만 골라서 먼저 알려드립니다.
               </p>
               <div className="hero-cta">
-                <button className="btn btn-google btn-lg" onClick={login}><GoogleMark />Google로 시작하기</button>
-                <a className="btn btn-quiet btn-lg" href="#preview"><Icon name="columns" size={18} />30초 미리보기</a>
+                {user ? (
+                  <>
+                    <button className="btn btn-primary btn-lg" onClick={() => go('mypage')}><Icon name="sliders" size={18} />마이페이지</button>
+                    <button className="btn btn-quiet btn-lg" onClick={() => go('chat')}>대화 계속하기</button>
+                  </>
+                ) : (
+                  <>
+                    <button className="btn btn-google btn-lg" onClick={login}><GoogleMark />Google로 시작하기</button>
+                    <a className="btn btn-quiet btn-lg" href="#preview"><Icon name="columns" size={18} />30초 미리보기</a>
+                  </>
+                )}
               </div>
               <p className="hero-note">
                 <Icon name="lock" size={15} />
@@ -419,12 +438,25 @@ export function Home() {
         <section className="sec" style={{ paddingTop: 0 }}>
           <div className="wrap">
             <div className="neu close" id="login">
-              <h2>오늘 정한 목표가,<br />내일 아침부터 따라옵니다</h2>
-              <p>구글 계정으로 시작하면 계획이 저장되고, 다음 날부터 브리핑이 도착합니다. 계좌 연결은 필요하지 않습니다.</p>
-              <div className="hero-cta">
-                <button className="btn btn-google btn-lg" onClick={login}><GoogleMark />Google로 시작하기</button>
-                <a className="btn btn-quiet btn-lg" href="#preview">먼저 계산만 해보기</a>
-              </div>
+              {user ? (
+                <>
+                  <h2>오늘도 계획을 이어가 볼까요?</h2>
+                  <p>마이페이지에서 지금까지 설정한 목표와 예상 결과를 한눈에 확인할 수 있어요.</p>
+                  <div className="hero-cta">
+                    <button className="btn btn-primary btn-lg" onClick={() => go('mypage')}><Icon name="sliders" size={18} />마이페이지로 이동</button>
+                    <button className="btn btn-quiet btn-lg" onClick={() => go('chat')}>대화 계속하기</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2>오늘 정한 목표가,<br />내일 아침부터 따라옵니다</h2>
+                  <p>구글 계정으로 시작하면 계획이 저장되고, 다음 날부터 브리핑이 도착합니다. 계좌 연결은 필요하지 않습니다.</p>
+                  <div className="hero-cta">
+                    <button className="btn btn-google btn-lg" onClick={login}><GoogleMark />Google로 시작하기</button>
+                    <a className="btn btn-quiet btn-lg" href="#preview">먼저 계산만 해보기</a>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </section>

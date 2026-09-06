@@ -11,10 +11,11 @@ import { Plan } from './screens/Plan.jsx';
 import { Brief } from './screens/Brief.jsx';
 import { Data } from './screens/Data.jsx';
 import { Settings } from './screens/Settings.jsx';
+import { MyPage } from './screens/MyPage.jsx';
 import { useRoute, go } from './routing.js';
-import { planReady, useStore } from './store.js';
+import { S, planReady, useStore } from './store.js';
 
-const VIEWS = { chat: Chat, plan: Plan, brief: Brief, data: Data, settings: Settings };
+const VIEWS = { chat: Chat, plan: Plan, brief: Brief, data: Data, settings: Settings, mypage: MyPage };
 
 export function App() {
   const r = useRoute();
@@ -24,6 +25,10 @@ export function App() {
 
   // 계획이 없는데 #/plan으로 들어오면 대화로 보낸다.
   useEffect(() => { if (r === 'plan' && !ready) go('chat'); }, [r, ready]);
+
+  // 로그인하지 않은 채로 #/mypage에 들어오면 홈으로 보낸다. 마이페이지는
+  // 로그인한 사용자에 대한 정보를 보여주는 화면이라 로그인 없이는 의미가 없다.
+  useEffect(() => { if (r === 'mypage' && !S.user) go('start'); }, [r, S.user]);
 
   // 없는 화면(#/xyz)으로 들어오면 랜딩으로 되돌린다. 주소창에 죽은 경로가 남지 않게.
   useEffect(() => { if (r !== 'start' && !VIEWS[r]) go('start'); }, [r]);

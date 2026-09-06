@@ -1,21 +1,16 @@
-// Gemini 호출부. 브라우저에서 REST를 직접 친다(SDK를 넣지 않는다).
+// Gemini 호출부. 실제 구글 API 통신은 Supabase Edge Function(gemini)이 대신한다.
+// 여기엔 API 키가 없다 — 서버 기본 키는 Edge Function 쪽 환경변수에만 있고,
+// 개인 키(설정 화면에서 넣은 값)만 요청 본문에 실려서 나간다.
 //
-// 모델 선택 근거 (2026-09-01 실측, 같은 프롬프트/스키마)
+// 모델 선택 근거 (2026-09-01 실측, 같은 프롬프트/스키마) — 실제 시도 순서는
+// Edge Function이 관리한다. 여기 배열은 설정 화면 등에서 참고용으로만 쓴다.
 //   gemini-3.5-flash       thinkingBudget:0 → 2.1초   ← 1순위. 품질·속도 균형
 //   gemini-3.1-flash-lite                   → 1.0초      문장은 밋밋하지만 빠르고 한도가 넉넉하다
 //   gemini-3-flash-preview                  → 1.7초
-//   gemini-3.5-flash-lite  thinkingBudget 미지원 → 400  제외
-//   gemini-3.6-flash       thinkingBudget 미지원 → 16.6초  카드 하나에 쓰기엔 너무 느리다
-//   gemini-3.7-flash                        → 503        수요 몰림, 아직 불안정
-//   gemini-2.5-flash                        → 404        신규 사용자에게 더 이상 열리지 않는다
 import { getKey } from './apiKey.js';
+import { supabase } from '../supabaseClient.js';
 
-// 무료 등급 한도는 모델마다 따로 잡힌다(gemini-3.5-flash는 프로젝트·모델당 하루 20회).
-// 그래서 429도 다음 모델로 넘어간다 — 시연 도중 한도에 걸려도 카드가 계속 뜨게 하려는 목적이다.
-// 앞쪽일수록 문장 품질이 좋고, 뒤로 갈수록 가볍고 한도가 넉넉하다.
 const MODELS = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview'];
-const ENDPOINT = m => `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`;
-const TIMEOUT = 25000;
 
 /** 화면에 그대로 띄울 수 있는 한국어 사유. code는 로그·분기용. */
 class GeminiError extends Error {
@@ -40,68 +35,25 @@ const err = code => new GeminiError(code, MSG[code] ?? MSG.http);
 /**
  * 구조화 출력 한 번 호출. schema를 주면 JSON 객체를, 안 주면 문자열을 돌려준다.
  * 반환: { data, model, ms }
+ *
+ * 참고: signal로 넘어온 취소는 Edge Function 요청 자체를 중단시키지는 않는다
+ * (supabase-js invoke가 AbortSignal을 직접 받지 않는다). 다만 결과가 와도
+ * aiCoach.js 쪽에서 signal.aborted를 확인해 오래된 결과는 버리므로, 화면에
+ * 잘못된 결과가 뜨는 일은 없다. 서버 자원 낭비만 약간 있을 수 있는 정도다.
  */
 async function callGemini({ system, user, schema, signal, maxOutputTokens = 2048 }) {
-  const key = getKey();
-  if (!key) throw err('no-key');
+  const userKey = getKey() || undefined;   // 개인 키가 있으면 실어 보내고, 없으면 서버 기본 키를 쓴다.
 
-  const body = {
-    contents: [{ role: 'user', parts: [{ text: user }] }],
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens,
-      // 카드 하나 띄우는 데 사고 토큰을 쓸 이유가 없다. 이게 16초 → 2초를 만든다.
-      thinkingConfig: { thinkingBudget: 0 },
-      ...(schema ? { responseMimeType: 'application/json', responseSchema: schema } : {}),
-    },
-    ...(system ? { systemInstruction: { parts: [{ text: system }] } } : {}),
-  };
+  const { data, error } = await supabase.functions.invoke('gemini', {
+    body: { system, user, schema, maxOutputTokens, userKey },
+  });
 
-  let last = err('http');
-  for (const model of MODELS) {
-    const t0 = Date.now();
-    const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort('timeout'), TIMEOUT);
-    const onAbort = () => ctl.abort('caller');
-    signal?.addEventListener('abort', onAbort);
-    try {
-      const res = await fetch(ENDPOINT(model), {
-        method: 'POST',
-        headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: ctl.signal,
-      });
-      if (!res.ok) {
-        // 다음 모델로 넘어갈 만한 것: 404(모델 정리됨) · 503(붐빔) · 429(그 모델 한도 소진)
-        //   400도 넘어간다 — 모델마다 지원 파라미터가 달라서 나는 경우가 실제로 있었다
-        //   (gemini-3.5-flash-lite·3.6-flash는 thinkingBudget을 거부한다).
-        // 키 문제(401/403)만 모델을 바꿔도 같으므로 즉시 실패시킨다.
-        if (res.status === 401 || res.status === 403) throw err('auth');
-        if (res.status === 429) { last = err('quota'); continue; }
-        if (res.status === 503) { last = err('busy'); continue; }
-        last = err(res.status === 400 ? 'param' : 'http');
-        continue;
-      }
-      const j = await res.json();
-      const cand = j.candidates?.[0];
-      if (!cand || cand.finishReason === 'SAFETY') throw err('blocked');
-      const text = cand.content?.parts?.map(p => p.text).filter(Boolean).join('') ?? '';
-      if (!text) throw err('parse');
-      let data = text;
-      if (schema) {
-        try { data = JSON.parse(text); } catch { throw err('parse'); }
-      }
-      return { data, model, ms: Date.now() - t0 };
-    } catch (e) {
-      if (e instanceof GeminiError) { if (['http', 'param', 'busy', 'quota'].includes(e.code)) { last = e; continue; } throw e; }
-      if (ctl.signal.reason === 'caller') throw e;                 // 화면이 떠나서 취소한 것
-      throw err(ctl.signal.aborted ? 'timeout' : 'network');
-    } finally {
-      clearTimeout(timer);
-      signal?.removeEventListener('abort', onAbort);
-    }
-  }
-  throw last;
+  if (signal?.aborted) throw err('network');
+
+  if (error) throw err('network');           // Edge Function 자체를 못 부른 경우 (네트워크, 배포 안 됨 등)
+  if (data?.error) throw err(data.error.code);   // Edge Function이 정상 응답했지만 내용이 실패인 경우
+
+  return { data: data.data, model: data.model, ms: data.ms };
 }
 
 /** 자동 호출을 걸지 말아야 하는 환경인지. UI 테스트(Playwright)에서는 네트워크를 타지 않는다. */

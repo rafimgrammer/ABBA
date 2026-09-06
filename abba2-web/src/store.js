@@ -5,6 +5,12 @@
 //   화면 갱신만 `render()` → `update()`(구독자 통지)로 바꿨다.
 //   컴포넌트는 useStore()로 구독한다 — useSyncExternalStore 기반이라
 //   S를 제자리에서 수정해도 React가 정확히 한 번 다시 그린다.
+//
+// 저장(persist) 노트
+//   S.a(목표 설정 답변)와 S.brief(브리핑 설정)는 로그인한 사용자마다 Supabase의
+//   user_state 테이블 한 행에 그대로 저장된다. 로그인하면 그 행을 불러와 S에
+//   덮어쓰고, 그 뒤로는 update()가 호출될 때마다(=화면이 뭔가 바뀔 때마다) 잠시
+//   기다렸다가(무한 재저장을 막으려고) 자동으로 다시 저장한다.
 import { useSyncExternalStore } from 'react';
 import { M, GOAL_LABEL } from './lib/config.js';
 import { qFor } from './lib/questions.js';
@@ -29,6 +35,8 @@ const S = {
   ask: { items: [], busy: false, error: null },
   // 로그인한 사용자. 로그아웃 상태면 null.
   user: null,
+  // 서버에 마지막으로 저장된 시각 (마이페이지에 "마지막 저장" 표시용). ISO 문자열.
+  lastSavedAt: null,
 };
 
 // ---- 구독 ----
@@ -37,29 +45,84 @@ const listeners = new Set();
 
 function subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 
-/** 상태를 바꾼 뒤 호출한다. 예전 render()와 같은 자리에 그대로 둔다. */
-function update() { version += 1; listeners.forEach(fn => fn()); }
+/** 구독자에게만 알린다 — 서버 저장을 새로 예약하지 않는다. 저장 완료 후 통지할 때 쓴다. */
+function notify() { version += 1; listeners.forEach(fn => fn()); }
+
+/** 상태를 바꾼 뒤 호출한다. 예전 render()와 같은 자리에 그대로 둔다.
+ * 화면 통지 + (로그인 상태면) 서버 자동 저장 예약을 함께 한다. */
+function update() { notify(); scheduleSave(); }
 
 /** 화면이 S를 구독한다. 반환값은 늘 같은 S 객체(제자리 수정)다. */
 function useStore() { useSyncExternalStore(subscribe, () => version, () => version); return S; }
 
-// ---- 인증 ----
-// 앱이 처음 뜰 때 이미 로그인된 세션이 있는지 확인.
+// ---- 인증 + 저장된 데이터 불러오기/저장하기 ----
+
+// 이 사용자 id에 대해 이미 한 번 불러왔는지. 불러오기 전에 자동 저장이 먼저
+// 실행되면 서버에 있던 값을 빈 값으로 덮어써 버릴 수 있어서, 이 값으로 막는다.
+let loadedForUserId = null;
+let saveTimer = null;
+
+/** 로그인한 사용자의 목표 설정·브리핑 설정을 서버에서 불러와 S에 덮어쓴다. */
+async function loadUserState(userId) {
+  const { data, error } = await supabase
+    .from('user_state')
+    .select('plan, brief, updated_at')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!error && data) {
+    if (data.plan && Object.keys(data.plan).length) S.a = { ...blank(), ...data.plan };
+    if (data.brief && Object.keys(data.brief).length) S.brief = { ...S.brief, ...data.brief };
+    S.lastSavedAt = data.updated_at ?? null;
+  }
+  loadedForUserId = userId;
+  notify();   // 방금 불러온 값을 곧바로 다시 저장할 필요는 없으니 notify()만 한다.
+}
+
+/** 변경 사항을 잠시 모았다가(1.2초) 한 번에 저장한다. 로그인 전이거나 아직
+ * 불러오기 전이면 아무것도 하지 않는다(빈 값으로 덮어쓰는 사고를 막는다). */
+function scheduleSave() {
+  if (!S.user || loadedForUserId !== S.user.id) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const { error } = await supabase.from('user_state').upsert({
+      user_id: S.user.id,
+      plan: S.a,
+      brief: S.brief,
+      updated_at: new Date().toISOString(),
+    });
+    if (!error) { S.lastSavedAt = new Date().toISOString(); notify(); }
+  }, 1200);
+}
+
+// 앱이 처음 뜰 때 이미 로그인된 세션이 있는지 확인하고, 있으면 저장된 데이터를 불러온다.
 supabase.auth.getSession().then(({ data: { session } }) => {
   S.user = session?.user ?? null;
-  update();
+  notify();
+  if (S.user) loadUserState(S.user.id);
 });
 
-// 로그인 / 로그아웃 / 토큰 갱신 등 상태가 바뀔 때마다 S.user를 갱신.
-supabase.auth.onAuthStateChange((_event, session) => {
-  S.user = session?.user ?? null;
-  update();
+// 로그인 / 로그아웃 / 토큰 갱신 등 상태가 바뀔 때마다 S.user를 갱신한다.
+// 방금 로그인에 성공한 순간(SIGNED_IN)에는, 저장된 값을 불러온 뒤 그 결과에 따라
+// (이미 목표를 세워둔 적 있으면 마이페이지로, 처음이면 대화로) 자동 이동한다.
+supabase.auth.onAuthStateChange((event, session) => {
+  const nextUser = session?.user ?? null;
+  S.user = nextUser;
+  notify();
+
+  if (event === 'SIGNED_OUT') { loadedForUserId = null; return; }
+
+  if (nextUser && loadedForUserId !== nextUser.id) {
+    loadUserState(nextUser.id).then(() => {
+      if (event === 'SIGNED_IN') go(planReady() ? 'mypage' : 'chat');
+    });
+  }
 });
 
 async function logout() {
   await supabase.auth.signOut();
   S.user = null;
-  update();
+  notify();
 }
 
 // ---- 진행도 ----

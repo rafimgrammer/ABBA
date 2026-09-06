@@ -7,7 +7,13 @@ import { go } from '../routing.js';
 export function Strip() {
   return (
     <div className="strip">
-      <div><b>{APP.name}</b> 시안 v{APP.version} · 팀 공유판 · 예시 데이터</div>
+      {/* 홈(랜딩)으로 가는 로고. 이 Strip은 모든 앱 화면에서 TopBar보다 먼저,
+          화면 맨 위에 뜨는 자리라 여기 넣어야 확실히 "제일 위"에 보인다. */}
+      <a href="#/" aria-label="홈으로" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none' }}>
+        <span style={{ width: 18, height: 18, borderRadius: 5, background: '#1D9E75', flexShrink: 0 }} />
+        <span style={{ fontSize: 14, fontWeight: 800 }}>ABBA <span style={{ color: '#1D9E75' }}>2.0</span></span>
+        <span style={{ fontSize: 11, opacity: 0.7, marginLeft: 2 }}>시안 v{APP.version} · 팀 공유판 · 예시 데이터</span>
+      </a>
       <button onClick={openSheet}>화면 목록</button>
     </div>
   );
@@ -32,7 +38,10 @@ export function TopBar({ title, back = true, backTo, right, bar }) {
 const TABS = [['plan', 'home', '계획'], ['brief', 'bell', '브리핑'], ['settings', 'sliders', '설정']];
 
 export function TabBar({ cur }) {
-  const on = cur === 'data' ? 'settings' : cur;
+  // 'data'와 'mypage'는 하단 탭에 자기 자리가 없는 부속 화면이라, 눌러야 할 탭은
+  // 둘 다 '설정'으로 맞춘다. 그래야 그 화면에 있을 때도 탭바가 엉뚱한 곳(또는
+  // 아무 데도)을 가리키지 않는다.
+  const on = (cur === 'data' || cur === 'mypage') ? 'settings' : cur;
   return (
     <nav className="tabbar">
       {TABS.map(([r, i, l]) => (
@@ -64,6 +73,7 @@ export function Sheet() {
         <SheetLink href="#/brief" label="4 오늘의 브리핑" desc="하루 한 번 알림 예시" onClick={closeSheet} />
         <SheetLink href="#/data" label="3 AI가 학습하는 금융 정보" desc="데이터 출처·갱신 주기" onClick={closeSheet} />
         <SheetLink href="#/settings" label="알림 설정" desc="시간·항목·연결" onClick={closeSheet} />
+        {s.user && <SheetLink href="#/mypage" label="마이페이지" desc="내 정보·목표·예상 결과 한눈에" onClick={closeSheet} />}
         <h4 style={{ marginTop: 14 }}>팀 문서 <span className="muted" style={{ fontWeight: 400, fontSize: 12 }}>새 창으로 열림</span></h4>
         {DOCS.map(d => (
           <a key={d.url} className="doc" href={d.url} target="_blank" rel="noopener">{d.title}<span>{d.desc}</span></a>
