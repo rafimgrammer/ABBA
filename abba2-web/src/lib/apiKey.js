@@ -1,43 +1,39 @@
-// Gemini API 키. 저장소에는 절대 들어가지 않는다.
+// Gemini API 키. 이제 이 파일은 "개인 키로 덮어쓰기" 기능만 담당한다.
 //
 // 왜 이렇게 바꿨나
-//   예전에는 키 문자열이 이 파일에 그대로 박혀 있었고 빌드 산출물(dist/*.html)에도 실렸다.
-//   그래서 GitHub Push Protection이 푸시를 막았다. 지금은 두 경로로만 들어온다.
+//   전에는 빌드 시점에 .env.local의 VITE_GEMINI_API_KEY를 이 파일이 읽어와
+//   기본값으로 썼다. Vite는 이 값을 번들(dist/*.js)에 문자열 그대로 박아 넣기 때문에,
+//   브라우저 개발자 도구로 누구나 그 키를 볼 수 있었다 — 진짜 노출 지점은 이 파일이
+//   아니라 이 값을 그대로 구글에 실어 보내던 gemini.js였지만, 값이 애초에 여기서
+//   브라우저로 흘러 들어온 게 원인이었다.
 //
-//     1) 빌드 시점 — .env.local 의 VITE_GEMINI_API_KEY  (.gitignore 대상이라 커밋되지 않는다)
-//     2) 실행 시점 — 설정 화면에서 넣은 키 (localStorage. 이 브라우저에만 남는다)
-//
-//   둘 다 없으면 AI 카드만 "키가 없어요"를 띄우고 나머지 화면은 그대로 동작한다.
-//   백엔드(Supabase Edge Function)로 옮길 때 고칠 파일은 이 파일과 gemini.js 둘뿐이다.
-
-// Vite가 빌드할 때 값을 끼워 넣는다. .env.local이 없으면 빈 문자열이 된다.
-// Node로 lib을 직접 돌려 검증할 때는 process.env에서 읽는다(그 경로를 살려두려는 목적).
-const FROM_ENV =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
-  globalThis.process?.env?.VITE_GEMINI_API_KEY ||
-  '';
+//   지금은 기본 키가 Supabase Edge Function(서버) 안에만 있고 브라우저로 내려오지
+//   않는다. 그래서 FROM_ENV 로직 자체를 없앴다. 이 파일은 이제 "사용자가 설정
+//   화면에서 자기 키를 넣었을 때만" 그 값을 기억했다가 gemini.js가 요청 보낼 때
+//   실어 보내게 해주는 역할만 한다 (개인 키는 프로젝트 비밀이 아니라 사용자 본인의
+//   값이라, 요청 본문에 실려 나가도 문제되지 않는다).
 
 const LS = 'abba2.gemini.key';
 
-/** 브라우저에 저장한 개인 키가 있으면 그걸 쓰고, 없으면 빌드에 주입된 키로 떨어진다. */
+/** 사용자가 설정 화면에서 넣은 개인 키. 없으면 빈 문자열(=서버 기본 키 사용). */
 function getKey() {
-  try { return localStorage.getItem(LS) || FROM_ENV; } catch { return FROM_ENV; }
+  try { return localStorage.getItem(LS) || ''; } catch { return ''; }
 }
 
-/** 설정 화면에서 키를 넣으면 이 브라우저에서만 그 키를 쓴다. */
+/** 설정 화면에서 키를 넣으면 이 브라우저에서만 그 키를 쓴다. 빈 값을 넣으면 서버 기본 키로 되돌아간다. */
 function setKey(k) {
   try { k ? localStorage.setItem(LS, k) : localStorage.removeItem(LS); } catch { /* file://에서 막힐 수 있다 */ }
 }
 
-/** 빌드에 주입된 키를 쓰는 중인지 (설정 화면 표시용). */
-function usingBuiltIn() { return !!FROM_ENV && getKey() === FROM_ENV; }
+/** 서버 기본 키를 쓰는 중인지 (설정 화면 표시용). 개인 키를 안 넣었으면 true. */
+function usingBuiltIn() { return !getKey(); }
 
-/** 키가 아예 없는 상태인지. */
-function hasKey() { return !!getKey(); }
+/** 항상 true — 서버(Edge Function)가 기본 키를 갖고 있어서 키가 아예 없는 상태는 없다. */
+function hasKey() { return true; }
 
-/** 화면에 보여줄 때는 앞뒤만 남긴다. */
+/** 화면에 보여줄 때는 앞뒤만 남긴다. 개인 키가 없으면 "서버 기본 키 사용 중"이라고 표시. */
 function maskKey(k = getKey()) {
-  if (!k) return '설정 안 됨';
+  if (!k) return '서버 기본 키 사용 중';
   return k.length > 14 ? `${k.slice(0, 8)}…${k.slice(-4)}` : '설정됨';
 }
 

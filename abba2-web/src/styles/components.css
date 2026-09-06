@@ -46,3 +46,16 @@ h1{font-size:22px;font-weight:700;line-height:1.35;letter-spacing:-.2px;margin:8
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;background:#17202A;color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;z-index:50;white-space:nowrap}
 .fade{animation:fade .18s ease-out}
 .tagx.live{background:#E3F5EA;color:#157A43}
+
+
+.mp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid #EEF1F0;
+  font-size: 13.5px;
+}
+.mp-row:last-of-type { border-bottom: none; }
+.mp-row span { color: #6B7A75; }
+.mp-row b { font-weight: 600; color: #1A1F1D; }
