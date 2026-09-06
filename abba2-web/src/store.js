@@ -26,6 +26,11 @@ const S = {
   ai: { on: true, status: 'idle', planKey: null, data: null, meta: null, error: null },
   // 계획에 대해 물어보기. 호출은 askPlan.js가 한다.
   ask: { items: [], busy: false, error: null },
+<<<<<<< HEAD
+=======
+  // 로그인한 사용자. 로그아웃 상태면 null.
+  user: null,
+>>>>>>> parent of 46882ff (구글 로그인 연동 보완하고 마이페이지 만듬)
 };
 
 // ---- 구독 ----
@@ -40,6 +45,28 @@ function update() { version += 1; listeners.forEach(fn => fn()); }
 /** 화면이 S를 구독한다. 반환값은 늘 같은 S 객체(제자리 수정)다. */
 function useStore() { useSyncExternalStore(subscribe, () => version, () => version); return S; }
 
+<<<<<<< HEAD
+=======
+// ---- 인증 ----
+// 앱이 처음 뜰 때 이미 로그인된 세션이 있는지 확인.
+supabase.auth.getSession().then(({ data: { session } }) => {
+  S.user = session?.user ?? null;
+  update();
+});
+
+// 로그인 / 로그아웃 / 토큰 갱신 등 상태가 바뀔 때마다 S.user를 갱신.
+supabase.auth.onAuthStateChange((_event, session) => {
+  S.user = session?.user ?? null;
+  update();
+});
+
+async function logout() {
+  await supabase.auth.signOut();
+  S.user = null;
+  update();
+}
+
+>>>>>>> parent of 46882ff (구글 로그인 연동 보완하고 마이페이지 만듬)
 // ---- 진행도 ----
 const ORDER = ['goalType', 'amount', 'months', 'lump', 'income', 'expense', 'saving', 'risk'];
 
